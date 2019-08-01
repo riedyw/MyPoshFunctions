@@ -33,10 +33,6 @@ To import the module enter the following command
 
 For the scripts themselves see [**Scripts**](Scripts) folder.
 
-- CopyNul.cmd
-- LongNamePath.cmd
-- PsLaunch.cmd
-- ShortNamePath.cmd
-- Test-IsAdmin.cmd
+- This is vestige from another git repository.
 
 ## EOF - End Of File Comment
