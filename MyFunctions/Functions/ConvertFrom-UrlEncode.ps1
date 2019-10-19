@@ -1,44 +1,48 @@
-Function ConvertFrom-UrlEncode ([string] $URL) {
-    $Decode = [System.Web.HttpUtility]::UrlDecode($URL)
-    Write-Output $Decode
+Function ConvertFrom-UrlEncode {
+<#
+.SYNOPSIS
+    Converts a URL encoded string back into a normal string
+.DESCRIPTION
+    Converts a URL encoded string back into a normal string
+.PARAMETER URL
+    The encoded URL string
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    ConvertFrom-UrlEncode 'https%3a%2f%2fwww.google.com%2f'
+
+    Would return
+    https://www.google.com/
+.EXAMPLE
+    ConvertFrom-UrlEncode 'http%3a%2f%2fLong+filename.docx'
+
+    Would return
+    http://Long filename.docx
+.OUTPUTS
+    [string]
+.LINK
+    about_Properties
+#>
+
+[cmdletbinding()]
+Param(
+    [Parameter()]
+    [string] $URL
+)
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    Process {
+        $Decode = [System.Web.HttpUtility]::UrlDecode($URL)
+        Write-Output $Decode
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
 }
 
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'ConvertFrom-UrlEncode'
-$FuncAlias       = 'UrlDecode'
-$FuncDescription = 'Converts a straight text URL back to an encoded one substituting reserved characters.'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-    $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
-
+Set-Alias -Name 'UrlDecode' -Value 'ConvertFrom-UrlEncode' -Description 'Alias for ConvertFrom-UrlEncode'

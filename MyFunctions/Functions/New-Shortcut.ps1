@@ -95,11 +95,15 @@ Function New-Shortcut {
     )
 #endregion Parameters
 
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
     Process {
         If (!($Path -match "^.*(\.lnk)$")) {
             $Path = "$Path`.lnk"
         }
-        [System.IO.FileInfo]$Path = $Path
+        [System.IO.FileInfo] $Path = $Path
         $ShouldMessage = "WHATIF: Would create SHORTCUT [$($path.fullname)] ARGUMENTS [$($Arguments)] DESCRIPTION [$($Description)] HOTKEY [$($HotKey)] WORKDIR [$($WorkDir)] WINDOWSTYLE [$($WindowStyle)] ICON [$($Icon)]"
         If ($PSCmdlet.ShouldProcess($ShouldMessage))
         {
@@ -152,36 +156,9 @@ Function New-Shortcut {
             }
         }
     }
-} #EndFunction New-Shortcut
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'New-Shortcut'
-    $FuncAlias       = ''
-    $FuncDescription = 'Creates a Windows .LNK shortcut'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} #EndFunction New-Shortcut

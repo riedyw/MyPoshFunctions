@@ -1,7 +1,4 @@
-# source: https://gallery.technet.microsoft.com/scriptcenter/ConvertTo-OrderedDictionary-cf2404ba
-# converted to function and added ability to copy OrderedDictionary
-
-function ConvertTo-OrderedDictionary {
+Function ConvertTo-OrderedDictionary {
 <#
 .SYNOPSIS
     Converts a HashTable, Array, or an OrderedDictionary to an OrderedDictionary.
@@ -23,6 +20,10 @@ function ConvertTo-OrderedDictionary {
     System.Collections.Specialized.OrderedDictionary
 .OUTPUTS
     System.Collections.Specialized.OrderedDictionary
+.NOTES
+    source: https://gallery.technet.microsoft.com/scriptcenter/ConvertTo-OrderedDictionary-cf2404ba
+    converted to function and added ability to copy OrderedDictionary
+
 .EXAMPLE
     PS C:\> $myHash = @{a=1; b=2; c=3}
     PS C:\> .\ConvertTo-OrderedDictionary.ps1 -Hash $myHash
@@ -70,75 +71,53 @@ function ConvertTo-OrderedDictionary {
         [parameter(Mandatory=$true, ValueFromPipeline=$true)]
         $Hash
     )
-    write-verbose ($Hash.gettype())
-    if ($Hash -is [System.Collections.Hashtable])
-    {
-        write-verbose '$Hash is a HashTable'
-        $dictionary = [ordered] @{}
-        $keys = $Hash.keys | sort
-        foreach ($key in $keys)
-        {
-            $dictionary.add($key, $Hash[$key])
-        }
-        $dictionary
-    }
-    elseif ($Hash -is [System.Array])
-    {
-        write-verbose '$Hash is an Array'
-        $dictionary = [ordered] @{}
-        for ($i = 0; $i -lt $hash.count; $i++)
-        {
-            $dictionary.add($i, $hash[$i])
-        }
-        $dictionary
-    }
-    elseif ($Hash -is [System.Collections.Specialized.OrderedDictionary])
-    {
-        write-verbose '$Hash is an OrderedDictionary'
-        $dictionary = [ordered] @{}
-        $keys = $Hash.keys
-        foreach ($key in $keys)
-        {
-            $dictionary.add($key, $Hash[$key])
-        }
-        $dictionary
-    }
-    else
-    {
-        Write-Error "Enter a hash table, an array, or an ordered dictionary."
-    }
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-OrderedDictionary'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts a HashTable, Array, or an OrderedDictionary to an OrderedDictionary'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
 
+    Process {
+        write-verbose ($Hash.gettype())
+        if ($Hash -is [System.Collections.Hashtable])
+        {
+            write-verbose '$Hash is a HashTable'
+            $dictionary = [ordered] @{}
+            $keys = $Hash.keys | sort-object
+            foreach ($key in $keys)
+            {
+                $dictionary.add($key, $Hash[$key])
+            }
+            $dictionary
+        }
+        elseif ($Hash -is [System.Array])
+        {
+            write-verbose '$Hash is an Array'
+            $dictionary = [ordered] @{}
+            for ($i = 0; $i -lt $hash.count; $i++)
+            {
+                $dictionary.add($i, $hash[$i])
+            }
+            $dictionary
+        }
+        elseif ($Hash -is [System.Collections.Specialized.OrderedDictionary])
+        {
+            write-verbose '$Hash is an OrderedDictionary'
+            $dictionary = [ordered] @{}
+            $keys = $Hash.keys
+            foreach ($key in $keys)
+            {
+                $dictionary.add($key, $Hash[$key])
+            }
+            $dictionary
+        }
+        else
+        {
+            Write-Error "Enter a hash table, an array, or an ordered dictionary."
+        }
+    }
 
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
+} #EndFunction ConvertTo-OrderedDictionary

@@ -46,41 +46,24 @@ Function ConvertTo-FileTime () {
                    Position=0)]
         [datetime] $DateTime
     )
-    $MaxTicks = 2650467743999999999
-    $Never    = 9223372036854775807
-    write-verbose "The max # of ticks is '$MaxTicks' and the special NEVER flag is '$Never'"
-    Write-verbose "You entered a datetime of: '$DateTime'"
-    write-output $DateTime.ToFileTime()
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+        $MaxTicks = 2650467743999999999
+        $Never    = 9223372036854775807
+        write-verbose "The max # of ticks is '$MaxTicks' and the special NEVER flag is '$Never'"
+
+    }
+
+    process {
+        Write-verbose "You entered a datetime of: '$DateTime'"
+        write-output $DateTime.ToFileTime()
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 } #EndFunction ConvertTo-FileTime
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-FileTime'
-    $FuncAlias       = 'ConvertTo-Ticks'
-    $FuncDescription = 'Tests a Port or a range of ports on a specific ComputerName'
-    $FuncVarName     = 'Converts a [datetime] or datetime [string] into a large integer filetime.'
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-        $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+Set-Alias -Name 'ConvertTo-Ticks' -Value 'ConvertTo-FileTime'

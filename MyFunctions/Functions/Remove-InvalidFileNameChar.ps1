@@ -113,11 +113,12 @@ function Remove-InvalidFileNameChar
     #endregion Parameters
     Begin
     {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
         #Get an array of invalid characters
         $arrInvalidChars = [System.IO.Path]::GetInvalidFileNameChars()
 
         #Cast into a string. This will include the space character
-        $invalidCharsWithSpace = [RegEx]::Escape([String]$arrInvalidChars)
+        $invalidCharsWithSpace = [RegEx]::Escape([String] $arrInvalidChars)
 
         #Join into a string. This will not include the space character
         $invalidCharsNoSpace = [RegEx]::Escape(-join $arrInvalidChars)
@@ -128,7 +129,7 @@ function Remove-InvalidFileNameChar
             if ($Replacement -match "[$invalidCharsWithSpace]")
             {
                 Write-Error -Message "The replacement string also contains invalid filename characters."
-                exit
+                return
             }
         }
         else
@@ -136,7 +137,7 @@ function Remove-InvalidFileNameChar
             if ($Replacement -match "[$invalidCharsNoSpace]")
             {
                 Write-Error -Message "The replacement string also contains invalid filename characters."
-                exit
+                return
             }
         }
 
@@ -168,7 +169,7 @@ function Remove-InvalidFileNameChar
                 #Try to cast to an int in case a valid integer as a string is passed.
                 try
                 {
-                    $entry = [int]$entry
+                    $entry = [int] $entry
                 }
                 catch
                 {
@@ -177,12 +178,12 @@ function Remove-InvalidFileNameChar
                 }
                 try
                 {
-                    $char = [char]$entry
+                    $char = [char] $entry
                 }
                 catch
                 {
                     Write-Error -Message "The entry `"$entry`" in RemoveOnly cannot be converted to a type of System.Char. Make sure the entry is either an integer or a one character string."
-                    exit
+                    return
                 }
 
                 if ($arrInvalidChars -contains $char -or $char -eq [char]32)
@@ -237,36 +238,9 @@ function Remove-InvalidFileNameChar
             }
         }
     } #EndProcess
-} #EndFunction Remove-InvalidFileNameChar
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Remove-InvalidFileNameChar'
-    $FuncAlias       = ''
-    $FuncDescription = 'Removes characters from a string that are not valid in a Windows file name'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} #EndFunction Remove-InvalidFileNameChar

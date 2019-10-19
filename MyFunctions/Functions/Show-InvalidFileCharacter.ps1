@@ -1,35 +1,26 @@
 Function Show-InvalidFileCharacter {
-    [System.IO.Path]::GetInvalidFileNameChars()
-}
+<#
+.SYNOPSIS
+    Shows invalid filename characters
+.DESCRIPTION
+    Shows invalid filename characters
+.NOTES
+    Author:     Bill Riedy
+#>
+    [cmdletbinding()]
+    [outputtype([char[]])]
+    Param ()
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Show-InvalidFileCharacter'
-    $FuncAlias       = ''
-    $FuncDescription = 'To show what the invalid file characters are'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        [System.IO.Path]::GetInvalidFileNameChars()
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+}

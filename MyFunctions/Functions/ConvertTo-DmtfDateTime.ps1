@@ -56,39 +56,19 @@ Function ConvertTo-DmtfDateTime () {
                    Position=0)]
         [datetime] $DateTime
     )
-    Write-verbose -message "You entered a datetime of: '$DateTime'"
-    $DmtfDateTime = [Management.ManagementDateTimeConverter]::ToDmtfDateTime(($DateTime))
-    write-output -inputobject $DmtfDateTime
-} #EndFunction ConvertTo-DmtfDateTime
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-DmtfDateTime'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts a datetime into a DTMF formatted datetime string'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    process {
+        Write-verbose -message "You entered a datetime of: '$DateTime'"
+        $DmtfDateTime = [Management.ManagementDateTimeConverter]::ToDmtfDateTime(($DateTime))
+        write-output -inputobject $DmtfDateTime
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} #EndFunction ConvertTo-DmtfDateTime

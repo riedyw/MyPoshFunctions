@@ -33,42 +33,22 @@ Function ConvertTo-UTC {
                     Position=0)]
         [datetime] $DateTime
     )
-    write-verbose "You entered a Local Time of:  '$DateTime'"
-    $strCurrentTimeZone = (Get-WmiObject win32_timezone).Description
-    write-verbose "Your local timezone is '$strCurrentTimeZone'"
-    $DateTime = $DateTime.ToUniversalTime()
-    write-verbose "The UTC time is: '$DateTime'"
-    write-output $DateTime
-} #EndFunction ConvertTo-UTC
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-UTC'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts a datetime from local time to UTC'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    process {
+        write-verbose "You entered a Local Time of:  '$DateTime'"
+        $strCurrentTimeZone = (Get-CimInstance win32_timezone).Description
+        write-verbose "Your local timezone is '$strCurrentTimeZone'"
+        $DateTime = $DateTime.ToUniversalTime()
+        write-verbose "The UTC time is: '$DateTime'"
+        write-output $DateTime
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
+} #EndFunction ConvertTo-UTC

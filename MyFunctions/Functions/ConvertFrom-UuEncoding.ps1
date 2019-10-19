@@ -1,18 +1,19 @@
+function ConvertFrom-UuEncoding {
 <#
-EXAMPLE USAGE
-
-$encodedString = ConvertTo-UuEncoding -Path .\cat.txt
-
-[System.IO.File]::WriteAllText("$pwd\catencoded.txt", $encodedString)
-
-Get-Content -Path .\catencoded.txt |
-ConvertFrom-UuEncoding |
-Set-Content -Path .\catdecoded.txt -Encoding Byte
+.SYNOPSIS
+    Convert from UU encoding back to normal data
+.DESCRIPTION
+    Convert from UU encoding back to normal data, UU encoding was an old way for binary data to be transferred via plain text links.
+.PARAMETER EncodedText
+    The UU encoded string
+.PARAMETER FileName
+    A file where the contents will be stored
+.PARAMETER TCP
+    Use TCP as the transport protocol
+.NOTES
+    Author:     Bill Riedy
 
 #>
-
-function ConvertFrom-UuEncoding
-{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline)]
@@ -26,6 +27,7 @@ function ConvertFrom-UuEncoding
 
     begin
     {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
         write-verbose 'Setting state'
         $state = 'ExpectingHeader'
     }
@@ -56,7 +58,7 @@ function ConvertFrom-UuEncoding
 
                 'Data'
                 {
-                    if ($line -eq '`')
+                    if ($line -eq '``')
                     {
                         $state = 'ExpectingFooter'
                     }
@@ -65,12 +67,12 @@ function ConvertFrom-UuEncoding
                         $chars = $line.ToCharArray()
 
                         if ($chars.Count -eq 0 -or ($chars.Count - 1) % 4 -ne 0 -or
-                            ($chars | Where-Object { [int]$_ -lt 32 -or [int]$_ -gt 96 }).Count -gt 0)
+                            ($chars | Where-Object { [int] $_ -lt 32 -or [int] $_ -gt 96 }).Count -gt 0)
                         {
                             throw "Invalid content in UUEncoded text."
                         }
 
-                        $bytes = [int]$chars[0] - 32
+                        $bytes = [int] $chars[0] - 32
 
                         if ($bytes -gt 45 -or $bytes -lt 0)
                         {
@@ -81,10 +83,10 @@ function ConvertFrom-UuEncoding
 
                         for ($i = 1; $i -lt $chars.Count; $i += 4)
                         {
-                            $int = ((([int]$chars[$i] - 32) -band 0x3F) -shl 18) -bor
-                                      ((([int]$chars[$i+1] - 32) -band 0x3F) -shl 12) -bor
-                                      ((([int]$chars[$i+2] - 32) -band 0x3F) -shl 6) -bor
-                                      (([int]$chars[$i+3] - 32) -band 0x3F)
+                            $int = ((([int] $chars[$i] - 32) -band 0x3F) -shl 18) -bor
+                                      ((([int] $chars[$i+1] - 32) -band 0x3F) -shl 12) -bor
+                                      ((([int] $chars[$i+2] - 32) -band 0x3F) -shl 6) -bor
+                                      (([int] $chars[$i+3] - 32) -band 0x3F)
 
                             for ($j = 0; $j -lt 3 -and $byteCounter -lt $bytes; $j++, $byteCounter++)
                             {
@@ -117,43 +119,8 @@ function ConvertFrom-UuEncoding
             }
         }
     }
+
+    end {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 }
-
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'ConvertFrom-UuEncoding'
-$FuncAlias       = ''
-$FuncDescription = 'Converts from a UUEncoded text string'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName
-    $AliasesToExport += $FuncAlias
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata

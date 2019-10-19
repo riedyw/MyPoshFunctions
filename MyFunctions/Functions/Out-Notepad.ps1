@@ -1,8 +1,19 @@
 # source http://community.idera.com/powershell/powertips/b/tips/posts/out-notepad-send-information-to-notepad
 
 #requires -Version 2
-function Out-Notepad
-{
+function Out-Notepad {
+<#
+.SYNOPSIS
+    Sends text to Notepad.exe
+.DESCRIPTION
+    Sends text to Notepad.exe
+.PARAMETER Text
+    A string to pass into Notepad.exe
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    "This is a test" | Out-Notepad
+#>
     [cmdletbinding()]
     param
     (
@@ -14,6 +25,7 @@ function Out-Notepad
     begin
     {
         $sb = New-Object -Typename System.Text.StringBuilder
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
     process
     {
@@ -30,40 +42,8 @@ function Out-Notepad
     '
         $type = Add-Type -MemberDefinition $sig -Name APISendMessage -PassThru
         $hwnd = $process.MainWindowHandle
-        [IntPtr]$child = $type::FindWindowEx($hwnd, [IntPtr]::Zero, "Edit", $null)
+        [IntPtr] $child = $type::FindWindowEx($hwnd, [IntPtr]::Zero, "Edit", $null)
         $null = $type::SendMessage($child, 0x000C, 0, $text)
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Out-Notepad'
-    $FuncAlias       = ''
-    $FuncDescription = 'Takes string from pipeline and will open a new instance of Notepad.exe and paste contents'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
-

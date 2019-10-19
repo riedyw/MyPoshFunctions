@@ -5,22 +5,22 @@ Function Set-ISEColor {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$True,ParameterSetName='Cooler',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [switch]$Cooler,
+        [switch] $Cooler,
 
         [Parameter(Mandatory=$True,ParameterSetName='Warmer',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [switch]$Warmer,
+        [switch] $Warmer,
 
         [Parameter(Mandatory=$True,ParameterSetName='Greener',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [switch]$Greener,
+        [switch] $Greener,
 
         [Parameter(Mandatory=$True,ParameterSetName='Darker',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [switch]$Darker,
+        [switch] $Darker,
 
         [Parameter(Mandatory=$True,ParameterSetName='Lighter',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [switch]$Lighter,
+        [switch] $Lighter,
 
         [Parameter(ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [int]$Degree = 20
+        [int] $Degree = 20
     )
 
     Begin{$XmlTheme = Get-CurrentISETheme; $Subtract = $Degree / 2}
@@ -193,35 +193,3 @@ Function Set-ISEColor {
             http://gallery.technet.microsoft.com/ISE-Color-Theme-Cmdlets-24905f9e
     #>
 }#end function Set-ISEColor
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-ISEColor'
-    $FuncAlias       = ''
-    $FuncDescription = 'Changes ISE Theme colors according to switch.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

@@ -42,6 +42,11 @@ Function Test-IsValidEmailAddress {
         [Alias("Address")]
         [string] $EmailAddress
     )
+
+     Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
     Process {
         Write-Verbose -message "You entered email address: [$($EmailAddress)]"
         Try {
@@ -59,36 +64,8 @@ Function Test-IsValidEmailAddress {
             Write-Output -inputobject $False
         }
     }
-} #EndFunction Test-IsValidEmailAddress
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsValidEmailAddress'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines of passed parameter is valid email address'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+} #EndFunction Test-IsValidEmailAddress

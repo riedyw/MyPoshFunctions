@@ -27,7 +27,7 @@ Function Convert-ROT13 {
     Guvf vf n frperg
 .EXAMPLE
     Convert-ROT13 -string 'one', 'two' -verbose
-    
+
     Would return
     VERBOSE: String is [one|two]
     VERBOSE: Current line is [one]
@@ -40,7 +40,7 @@ Function Convert-ROT13 {
     [string[]]
 .LINK
     https://en.wikipedia.org/wiki/ROT13
-    
+
 #>
 
 #region Parameter
@@ -54,8 +54,11 @@ Function Convert-ROT13 {
     begin {
         $Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
         $Cipher   = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm"
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+        Write-Verbose -message "Using parameter set $($PSCmdlet.ParameterSetName)"
+
     }
-    
+
     process {
         write-verbose "String is [$((($String | findstr /r ".") -split "`n") -join '|')]"
         Foreach ($line in $String) {
@@ -71,43 +74,9 @@ Function Convert-ROT13 {
             write-output $NewString
         }
     }
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-    $FuncName        = 'Convert-ROT13'
-    $FuncAlias       = ''
-    $FuncDescription = "Shifts letters in string by 13 positions. 'A' becomes 'N' and so on."
-    $FuncVarName     = ''
-
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+    end {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
 
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
+} # endfunction convert-rot13

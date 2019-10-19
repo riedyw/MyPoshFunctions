@@ -5,13 +5,13 @@ Function Set-ISETheme {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$True,ParameterSetName='FromFile',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [string]$File,
+        [string] $File,
 
         [Parameter(Mandatory=$True,ParameterSetName='FromReg',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [string]$ThemeName,
+        [string] $ThemeName,
 
         [Parameter(Mandatory=$True,ParameterSetName='FromObj',ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [object]$ThemeObject
+        [object] $ThemeObject
     )
 
     Begin{}
@@ -95,35 +95,3 @@ Function Set-ISETheme {
             http://gallery.technet.microsoft.com/ISE-Color-Theme-Cmdlets-24905f9e
     #>
 } #end function Set-ISETheme
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-ISETheme'
-    $FuncAlias       = ''
-    $FuncDescription = 'Applies ISE theme to current session.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

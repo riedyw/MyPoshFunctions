@@ -1,4 +1,29 @@
 Filter Out-Clipboard  {
+<#
+.SYNOPSIS
+    Takes input, converts it to a string and copies to the clipboard
+.DESCRIPTION
+    Takes input, converts it to a string and copies to the clipboard
+.PARAMETER Text
+    Either specified as an argument or it can be fed from the pipeline.
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    '123' | Out-Clipboard -Verbose
+    Would return:
+    VERBOSE: Sending [123
+
+    ] to the clipboard.
+.EXAMPLE
+    $profile | Out-Clipboard
+    Would return:
+    Nothing, but would place the contents of the $profile variable and place into the Windows clipboard.
+.OUTPUTS
+    [null]  Instead it places a string into the clipboard
+.LINK
+    https://www.Google.com
+#>
+
     [cmdletbinding()]
     param
     (
@@ -10,6 +35,7 @@ Filter Out-Clipboard  {
 
     begin {
         $sb = New-Object -Typename System.Text.StringBuilder
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
 
     process {
@@ -17,38 +43,8 @@ Filter Out-Clipboard  {
     }
 
     end {
+        write-verbose "Sending [$($sb.ToString() | out-string)] to the clipboard."
         $sb.ToString() | clip.exe
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Out-Clipboard'
-    $FuncAlias       = 'Out-Clip'
-    $FuncDescription = 'Puts data into the clipboard'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-        $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

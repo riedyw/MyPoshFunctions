@@ -1,57 +1,86 @@
 Function Parse-Bool {
+    <#
+    .SYNOPSIS
+        Parse a string and convert it to a Boolean
+    .DESCRIPTION
+        Parse a string and convert it to a Boolean
+    .PARAMETER InputVal
+        The string to be evaluated
+    .NOTES
+        Author:     Bill Riedy
+        Parse-Bool will .Trim() the InputVal before trying to parse it.
+    .EXAMPLE
+        Parse-Bool 'true'
+
+        Would return
+        True
+    .EXAMPLE
+        Parse-Bool 't'
+
+        Would return
+        True
+    .EXAMPLE
+        Parse-Bool 'on'
+
+        Would return
+        True
+    .EXAMPLE
+        Parse-Bool 0
+
+        Would return
+        False
+    .EXAMPLE
+        Parse-Bool 1
+
+        Any NON-zero numeric would return
+        True
+    .EXAMPLE
+        Parse-Bool 'nonsense'
+
+        Would return
+        False
+    .OUTPUTS
+        [bool]
+    .LINK
+        about_Properties
+    #>
+
     [CmdletBinding()]
+    [OutputType([bool])]
     param(
-        [Parameter(Position=0)]
-        [System.String]$inputVal
+        [Parameter(Position = 0)]
+        [System.String] $InputVal
     )
-    $inputVal = $inputVal.Trim()
-    if (($inputVal -eq '') -or ($inputVal -eq $null)) {
-        $false
-    } else {
-        if (test-isNumeric $inputVal) {
-            if ($inputVal -eq 0) {
-                $false
-            } else {
-                $true
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+    process {
+        $inputVal = $inputVal.Trim()
+        if (($inputVal -eq '') -or ($null -eq $inputVal)) {
+            $false
+        }
+        else {
+            if (test-isNumeric $inputVal) {
+                if ($inputVal -eq 0) {
+                    $false
+                }
+                else {
+                    $true
+                }
             }
-        } else {
-            switch -regex ($inputVal)
-            {
-                "^(true|yes|on|enabled|t|y)$" { $true }
-                default { $false }
+            else {
+                switch -regex ($inputVal) {
+                    "^(true|yes|on|enabled|t|y)$" { $true }
+                    default { $false }
+                }
             }
         }
     }
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Parse-Bool'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts a string value to Boolean'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} # endfunction parse-bool

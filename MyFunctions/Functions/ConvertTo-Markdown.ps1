@@ -1,8 +1,6 @@
-# source https://jdhitsolutions.com/blog/powershell/6065/converting-powershell-to-markdown/
-
 #requires -version 5.0
 Function ConvertTo-Markdown {
-    <#
+<#
 .Synopsis
 Convert pipeline output to a markdown document.
 .Description
@@ -58,6 +56,7 @@ Convertto-HTML
 Out-File
 .Notes
 Learn more about PowerShell: https://jdhitsolutions.com/blog/essential-powershell-resources/
+source https://jdhitsolutions.com/blog/powershell/6065/converting-powershell-to-markdown/
 .Inputs
 [object]
 #>
@@ -66,13 +65,13 @@ Learn more about PowerShell: https://jdhitsolutions.com/blog/essential-powershel
     [outputtype([string[]])]
     Param(
         [Parameter(Position = 0, ValueFromPipeline)]
-        [object]$Inputobject,
+        [object] $Inputobject,
         [Parameter()]
-        [string]$Title,
-        [string[]]$PreContent,
-        [string[]]$PostContent,
+        [string] $Title,
+        [string[]] $PreContent,
+        [string[]] $PostContent,
         [ValidateScript( {$_ -ge 10})]
-        [int]$Width = 80
+        [int] $Width = 80
     )
 
     Begin {
@@ -106,7 +105,7 @@ Learn more about PowerShell: https://jdhitsolutions.com/blog/essential-powershel
         if ($data) {
             #convert data to strings and trim each line
             Write-Verbose "[END    ] Converting data to strings"
-            [string]$trimmed = (($data | Out-String -Width $width).split("`n")).ForEach( {"$($_.trimend())`n"})
+            [string] $trimmed = (($data | Out-String -Width $width).split("`n")).ForEach( {"$($_.trimend())`n"})
             Write-Verbose "[END    ] Adding to markdown"
             $text += @"
 ``````text
@@ -126,35 +125,3 @@ $($trimmed.trimend())
     } #end
 
 } #close ConvertTo-Markdown
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-Markdown'
-    $FuncAlias       = ''
-    $FuncDescription = 'Convert pipeline output to a markdown document.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

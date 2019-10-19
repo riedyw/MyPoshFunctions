@@ -33,6 +33,10 @@ To import the module enter the following command
 
 For the scripts themselves see [**Scripts**](Scripts) folder.
 
-- This is vestige from another git repository.
+- CopyNul.cmd
+- LongNamePath.cmd
+- PsLaunch.cmd
+- ShortNamePath.cmd
+- Test-IsAdmin.cmd
 
 ## EOF - End Of File Comment

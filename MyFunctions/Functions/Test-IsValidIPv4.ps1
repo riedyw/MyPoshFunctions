@@ -1,67 +1,71 @@
 Function Test-IsValidIPv4 {
 <#
 .SYNOPSIS
-    blah
+    Verifies if passed parameter is a valid IP v4 address
 .DESCRIPTION
-    blah blah
+    Verifies if passed parameter is a valid IP v4 address. Can take single string or array of strings. Can also accept input from the pipeline.
 .EXAMPLE
-    Test-IsCapsLock
+    Test-IsValidIPv4 '10.0.0.1'
 .EXAMPLE
-    Test-IsCapsLock -Verbose
+    Test-IsValidIPv4 '10.0.0.1' -Verbose
+
+    VERBOSE: The string being tested if a valid IPv4 address is [10.0.0.1]
+    True
+.EXAMPLE
+    '192.168.1.1','invalid' | Test-IsValidIPv4 -IncludeInput
+
+    Input       Result
+    -----       ------
+    192.168.1.1   True
+    invalid      False
 #>
 
+#region Param
     [CmdletBinding()]
     [Outputtype([bool])]
     Param (
         [parameter(ValueFromPipeLine=$True,ValueFromPipeLineByPropertyName=$True)]
         [Alias("IP")]
-        [string] $IPAddress
+        [string[]] $IPAddress,
+        [switch] $IncludeInput
     )
+#endregion Param
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
     Process {
-        Try {
-            $check = [ipaddress] $IPAddress
-            # added check below to cover issue if enter only 3 octets
-            # [ipaddress] "10.1.4" resolves to "10.1.0.4"
-            if ($IPAddress -eq $check) {
-                Write-Output -inputobject $True
-            } else {
-                Write-Output -inputobject $False
+        foreach ($i in $IPAddress) {
+            Try {
+                Write-Verbose -Message "The string being tested if a valid IPv4 address is [$i]"
+                $check = [ipaddress] $i
+                # added check below to cover issue if enter only 3 octets
+                # [ipaddress] "10.1.4" resolves to "10.1.0.4"
+                if ($i -eq $check) {
+                    if ($IncludeInput) {
+                        New-Object -TypeName psobject -Property @{Input="$i";Result=$true}
+                    } else {
+                        Write-Output -InputObject $true
+                    }
+                } else {
+                    if ($IncludeInput) {
+                        New-Object -TypeName psobject -Property @{Input="$i";Result=$false}
+                    } else {
+                        Write-Output -InputObject $false
+                    }
+                }
+            } Catch {
+                if ($IncludeInput) {
+                    New-Object -TypeName psobject -Property @{Input="$i";Result=$false}
+                } else {
+                    Write-Output -inputobject $false
+                }
             }
-        } Catch {
-            Write-Output -inputobject $False
         }
     }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 } #EndFunction Test-IsValidIP
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsValidIPv4'
-    $FuncAlias       = ''
-    $FuncDescription = 'Verifies if passed parameter is a valid IP v4 address'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
-

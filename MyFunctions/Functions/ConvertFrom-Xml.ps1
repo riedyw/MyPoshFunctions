@@ -1,41 +1,32 @@
 function ConvertFrom-Xml($XML) {
-    foreach ($Object in @($XML.Objects.Object)) {
-        $PSObject = New-Object PSObject
-        foreach ($Property in @($Object.Property)) {
-            $PSObject | Add-Member -membertype NoteProperty -name $Property.Name -value $Property.InnerText
-        }
-        $PSObject
-    }
-}
+<#
+.SYNOPSIS
+    Convert XML to an object
+.DESCRIPTION
+    Convert XML to an object
+.PARAMETER XML
+    The XML that you want converted
+.NOTES
+    Author:     Bill Riedy
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertFrom-Xml'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts an XML object to a [psobject]'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+#>
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    process {
+        foreach ($Object in @($XML.Objects.Object)) {
+            $PSObject = New-Object PSObject
+            foreach ($Property in @($Object.Property)) {
+                $PSObject | Add-Member -membertype NoteProperty -name $Property.Name -value $Property.InnerText
+            }
+            $PSObject
+        }
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+}

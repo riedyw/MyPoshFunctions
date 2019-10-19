@@ -3,6 +3,23 @@
 ##
 
 Function Set-PrivateProfileString {
+<#
+.SYNOPSIS
+    Sets a value for single INI setting
+.DESCRIPTION
+    Sets a value for single INI setting
+.PARAMETER File
+    The explicit full path to the file
+.PARAMETER Category
+    The section of the INI file
+.PARAMETER Key
+    The key in the particular section
+.PARAMETER Value
+    The value you wish to set it to
+.NOTES
+    Author:     Bill Riedy
+#>
+
     ##############################################################################
     ##
     ## Set-PrivateProfileString.ps1
@@ -31,43 +48,22 @@ Function Set-PrivateProfileString {
         $key,
         $value)
 
-    ## Prepare the parameter types and parameter values for the Invoke-WindowsApi script
-    $parameterTypes = [string], [string], [string], [string]
-    $parameters = [string] $category, [string] $key, [string] $value, [string] $file
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
 
-    ## Invoke the API
-    [void] (Invoke-WindowsApi "kernel32.dll" ([UInt32]) "WritePrivateProfileString" $parameterTypes $parameters)
+    Process {
+        ## Prepare the parameter types and parameter values for the Invoke-WindowsApi script
+        $parameterTypes = [string], [string], [string], [string]
+        $parameters = [string] $category, [string] $key, [string] $value, [string] $file
+
+        ## Invoke the API
+        [void] (Invoke-WindowsApi "kernel32.dll" ([UInt32]) "WritePrivateProfileString" $parameterTypes $parameters)
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 
 } #EndFunction Set-PrivateProfileString
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-PrivateProfileString'
-    $FuncAlias       = ''
-    $FuncDescription = 'Writes to an INI file'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

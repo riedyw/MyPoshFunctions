@@ -19,6 +19,17 @@ Function ConvertFrom-UTC {
 
     Thursday, February 01, 2018 4:27:59 PM
 .EXAMPLE
+ConvertFrom-UTC '2/1/2018 9:27:59 PM' -verbose
+
+Would return
+VERBOSE: Starting ConvertFrom-UTC
+VERBOSE: You entered a UTC Time of:  '2/1/2018 9:27:59 PM'
+VERBOSE: Your local timezone is '(UTC-05:00) Eastern Time (US & Canada)'
+VERBOSE: Your local time is: '02/01/2018 16:27:59'
+
+Thursday, February 1, 2018 4:27:59 PM
+VERBOSE: Ending ConvertFrom-UTC
+.EXAMPLE
     "3/15/2018 12:00:00 PM" | ConvertFrom-UTC
 
     Assuming that your local time zone is EST, and your region/culture is EN-US this would return the datetime
@@ -36,53 +47,25 @@ Function ConvertFrom-UTC {
                    Position=0 )]
         [string] $UTCTime
     )
-    $newUTCTime = get-date $UTCTime
-    write-verbose "You entered a UTC Time of:  '$UTCTime'"
-    $strCurrentTimeZone = (Get-WmiObject win32_timezone).StandardName
-    $strCurrentTimeZoneDescription = (Get-WmiObject win32_timezone).Description
-    write-verbose "Your local timezone is '$strCurrentTimeZoneDescription'"
-    $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
-    $LocalTime = [System.TimeZoneInfo]::ConvertTimeFromUtc($newUTCTime, $TZ)
-    write-verbose "Your local time is: '$LocalTime'"
-    write-output $LocalTime
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    Process {
+        $newUTCTime = get-date $UTCTime
+        write-verbose "You entered a UTC Time of:  '$UTCTime'"
+        $strCurrentTimeZone = (Get-CimInstance win32_timezone).StandardName
+        $strCurrentTimeZoneDescription = (Get-CimInstance win32_timezone).Description
+        write-verbose "Your local timezone is '$strCurrentTimeZoneDescription'"
+        $TZ = [System.TimeZoneInfo]::FindSystemTimeZoneById($strCurrentTimeZone)
+        $LocalTime = [System.TimeZoneInfo]::ConvertTimeFromUtc($newUTCTime, $TZ)
+        write-verbose "Your local time is: '$LocalTime'"
+        write-output $LocalTime
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
 } #EndFunction ConvertFrom-UTC
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-    $FuncName        = 'ConvertFrom-UTC'
-    $FuncAlias       = ''
-    $FuncDescription = 'Converts a datetime from UTC to local time'
-    $FuncVarName     = ''
-
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
-

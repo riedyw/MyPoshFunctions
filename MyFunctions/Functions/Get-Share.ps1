@@ -41,19 +41,20 @@ Function Get-Share {
         [parameter()]
         [array] $Types
     )
+
     # Initialize
     $oldEA = $ErrorActionPreference
     $ErrorActionPreference = "continue"
     write-verbose -message "Saving current value of `$ErrorActionPreference [$($oldEa)] and setting it to 'Continue'"
     if ($ShareName -eq "*") { $ShareName = "" }
     try {
-        write-verbose -message 'Querying WMI for a list of shares'
-        [Array] $Shares = Get-WmiObject -Class win32_share -Filter "Name Like '%$ShareName%'" |
+        write-verbose -message 'Querying CIM for a list of shares'
+        [Array] $Shares = Get-CimInstance -Class win32_share -Filter "Name Like '%$ShareName%'" |
             select-object @{label = "ComputerName"; expression = {$_.pscomputername}}, @{label = "ShareName"; expression = {$_.name}},
                  Path, Type, Status
     } catch {
-        write-verbose -message 'Error running Get-WmiObject. Potential permissions problem'
-        write-error -message 'Get-WmiObject error'
+        write-verbose -message 'Error running Get-CimInstance permissions problem'
+        write-error -message 'Get-CimInstance error'
         return
     }
     if ($IgnoreAdmin) {
@@ -95,35 +96,3 @@ Function Get-Share {
     write-output -inputobject $shares
     # cleanup
 } #EndFunction Get-Share
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-Share'
-    $FuncAlias       = ''
-    $FuncDescription = 'To list shares on local computer'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

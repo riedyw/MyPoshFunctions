@@ -2,7 +2,7 @@ function Get-Enum {
     [cmdletbinding()]
     [OutputType([psobject])]
     param (
-        [type]$Type
+        [type] $Type
     )
     if ($Type.BaseType.FullName -ne 'System.Enum')
     {
@@ -15,7 +15,7 @@ function Get-Enum {
         $isFlagsEnum = $true
     }
     $props = @(
-        @{ Name = 'Name'; Expression={ [string]$_ } }
+        @{ Name = 'Name'; Expression={ [string] $_ } }
         @{ Name = 'Value'; Expression={ [uint32](Invoke-Expression "[$($type.FullName)]'$_'") }}
     )
     if ($isFlagsEnum)
@@ -24,36 +24,4 @@ function Get-Enum {
     }
     [enum]::GetNames($Type) |
     Select-Object -Property $props
-}
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-Enum'
-    $FuncAlias       = ''
-    $FuncDescription = 'To list enumerated datatypes'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+} #EndFunction: Get-Enum

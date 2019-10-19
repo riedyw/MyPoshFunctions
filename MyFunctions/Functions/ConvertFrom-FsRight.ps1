@@ -31,72 +31,51 @@ Function ConvertFrom-FsRight {
     param([uint64] $Rights)
 #endregion Parameters
 
-    $temp = @()
-    $fsPermission = Show-FsRight -Verbose:$false
-    $MatchFound = $false
-    $fsPermission | foreach-object {
-        #write-verbose "Name = [$($_.name)], Value = [$($_.Dec)]"
-        if ($Rights -eq $_.Dec) {
-            $temp += $_.Name
-            $MatchFound = $true
-            write-verbose "Temp now equal to [$($temp -join ',')]"
-            write-output -inputobject ( $_.Name )
-            break
-        }
-    }
-    if ( $MatchFound ) {
-        return
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
 
-    # Simple permissions hit a match, output the variable and return
-#    if ($temp) {
-#        write-output -inputobject ( $temp -join ',' )
-#    }
-    $fsPermission | foreach-object {
-        #write-verbose "Name = [$($_.name)], Value = [$($_.Dec)]"
-        if ($Rights -band $_.Dec) {
-            $temp += $_.Name
-            $MatchFound = $true
-            write-verbose "Temp now equal to [$($temp -join ',')]"
+    process {
+        $temp = @()
+        $fsPermission = Show-FsRight -Verbose:$false
+        $MatchFound = $false
+        $fsPermission | where-object { $_.Type -eq 'Combo' } | foreach-object {
+            #write-verbose "Name = [$($_.name)], Value = [$($_.Dec)]"
+            if ($Rights -eq $_.Dec) {
+                $temp += $_.Name
+                $MatchFound = $true
+                write-verbose "Temp now equal to [$($temp -join ',')]"
+                write-output -inputobject ( $_.Name )
+                #break
+            }
+        }
+
+        if (-not $MatchFound ) {
+
+            # Simple permissions hit a match, output the variable and return
+        #    if ($temp) {
+        #        write-output -inputobject ( $temp -join ',' )
+        #    }
+            $fsPermission | where-object { $_.Type -eq 'Single' } |  foreach-object {
+                #write-verbose "Name = [$($_.name)], Value = [$($_.Dec)]"
+                if ($Rights -band $_.Dec) {
+                    $temp += $_.Name
+                    $MatchFound = $true
+                    write-verbose "Temp now equal to [$($temp -join ',')]"
+                }
+            }
+            $MatchFound | out-null
+            # Simple permissions hit a match, output the variable and return
+            if ( $MatchFound ) {
+                write-output -inputobject ( $temp -join ',' )
+            } else {
+                write-output -inputobject $null
+            }
         }
     }
-    $MatchFound | out-null
-    # Simple permissions hit a match, output the variable and return
-    if ( $MatchFound ) {
-        write-output -inputobject ( $temp -join ',' )
-    } else {
-        write-output -inputobject $null
+
+    end {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
+
 } #EndFunction ConvertFrom-FsRight
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertFrom-FsRight'
-    $FuncAlias       = ''
-    $FuncDescription = 'To convert a [uint32] FileSystemRight value into a human readable form'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

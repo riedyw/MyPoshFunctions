@@ -1,33 +1,56 @@
-Filter grep ($keyword) { if ( ($_ | Out-String) -like "*$keyword*") { $_ } }
+Filter grep {
+<#
+.SYNOPSIS
+    A simple text filter to search for a string
+.DESCRIPTION
+    A simple text filter to search for a string
+.PARAMETER Keyword
+    The string searching for
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    'Hello','There' | grep 'Hello'
+    Would return
+    Hello
+.OUTPUTS
+    [string]
+.LINK
+    about_Functions
+#>
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'grep'
-    $FuncAlias       = ''
-    $FuncDescription = 'A simple filter'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+#region Parameter
+    [cmdletbinding()]
+    [OutputType([string])]
+    Param(
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [string[]] $String,
+
+        [Parameter(Mandatory = $False, ValueFromPipeline = $False)]
+        [string] $Keyword
+
+    )
+#endregion Parameter
+
+    Begin {
+        write-verbose "String to search for is [$Keyword]"
+        $Line = 0
+        $Count = 0
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        foreach ($s in $String) {
+            $Line ++
+            $Count ++
+            write-verbose "Line $Line is [$($s)]"
+            if ($s) {
+                $s | where-object { $_ -match $keyword }
+            }
+        }
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        if (-not $Count) {
+            write-verbose "No input"
+        }
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+}

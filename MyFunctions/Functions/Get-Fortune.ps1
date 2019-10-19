@@ -1,8 +1,17 @@
 Function Get-Fortune {
-    [System.IO.File]::ReadAllText((Split-Path -path $profile)+'\wisdom.txt') -replace "`r`n", "`n" -split "`n%`n" | Get-Random
+<#
+.SYNOPSIS
+    Display a short quote
+.DESCRIPTION
+    Display a short quote from a file which defaults to: ((Split-Path -path $profile)+'\wisdom.txt') but can be changed with parameter -Path.
+.NOTES
+    Author:     Bill Riedy
+    Version:    1.0
+    Date:       2018/03/13
+    To Do:      Nothing
+
     # Sample wisdom.txt file with 3 entries.  Each 'fortune' is delimited by a line consisting of just the pct sign
     # The last fortune in the file should NOT be terminated with a pct sign
-    <#
     %
     This too will pass.
        - Attar
@@ -12,37 +21,34 @@ Function Get-Fortune {
     %
     Time is money.
        - Benjamin Franklin
-    #>
+.OUTPUTS
+    [string]
+.PARAMETER Path
+    A path to a filename containing the fortunes. Defaults to: ((Split-Path -path $profile)+'\wisdom.txt')
+    Aliased to 'FileName' and 'Fortune'
+.Parameter Delimiter
+    Indicates delimiter between the individual fortunes. Defaults to "`n%`n" (newline percent newline)
+.LINK
+    Get-Content
+    Get-Random
+    Split-Path
+#>
+
+    #region Parameter
+    [cmdletbinding()]
+    [OutputType([string])]
+    Param(
+        [Parameter()]
+        [Alias('FileName','Fortune')]
+            [string] $Path = ((Split-Path -path $profile)+'\wisdom.txt'),
+        [Parameter()]
+            [string] $Delimiter = "`n%`n"
+    )
+    #endregion Parameter
+    write-verbose "Using [$path] for fortune file"
+    write-verbose "Delimiter [$Delimiter]"
+    (get-content -raw -Path $path) -replace "`r`n", "`n" -split "`n%`n" | Get-Random
+    #[System.IO.File]::ReadAllText((Split-Path -path $profile)+'\wisdom.txt') -replace "`r`n", "`n" -split "`n%`n" | Get-Random
 } #EndFunction Get-Fortune
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-Fortune'
-    $FuncAlias       = 'Fortune'
-    $FuncDescription = 'Gets a quote from a text file seperated by line containing a single character "%"'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-        $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+Set-Alias -Name 'Fortune' -Value 'Get-Fortune'

@@ -36,7 +36,10 @@ Function Format-WrapText {
         )
     #endregion Parameter
 
-    begin {}
+    begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
     process
     {
     #    [string] $text = $text
@@ -56,44 +59,7 @@ Function Format-WrapText {
             write-output -inputobject "$line"
         }
     }
-    end {}
+    end {Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"}
 } #EndFunction Format-WrapText
 
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'Format-WrapText'
-$FuncAlias       = 'WrapText'
-$FuncDescription = 'Wraps text at a particular column width'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-    $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
+Set-Alias -Name 'WrapText' -Value 'Format-WrapText'

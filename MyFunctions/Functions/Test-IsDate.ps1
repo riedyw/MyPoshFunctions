@@ -1,61 +1,71 @@
 Function Test-IsDate {
 <#
 .SYNOPSIS
-    blah
+    Tests to see if the specified string is a valid [datetime] string
 .DESCRIPTION
-    blah blah
+    Tests to see if the specified string is a valid [datetime] string. Can accept a string or an array of strings. Can also accept pipeline input.
 .EXAMPLE
-    Test-IsCapsLock
+    Test-IsDate
+
+    Would return $null
 .EXAMPLE
-    Test-IsCapsLock -Verbose
+    Test-IsDate 1/1/19 -Verbose
+
+    Would return:
+    VERBOSE: The string you entered is [1/1/19]
+    True
+.EXAMPLE
+    Test-IsDate @('1/1/1965','2/1/19','dne', '3 Feb 2019 17:00') -IncludeInput
+
+    Would return
+    Input            Result DateTime
+    -----            ------ --------
+    1/1/1965           True 1/1/1965 12:00:00 AM
+    2/1/19             True 2/1/2019 12:00:00 AM
+    dne               False
+    3 Feb 2019 17:00   True 2/3/2019 5:00:00 PM
 #>
+
+#region Param
     [CmdletBinding()]
+
     [OutputType([bool])]
+
     Param (
         [parameter(ValueFromPipeLine=$True,ValueFromPipeLineByPropertyName=$True)]
         [Alias("date")]
-        [string]$DateString
+        [string[]] $DateString,
+
+        [switch] $IncludeInput
     )
+#endregion Param
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+#region Main
     Process {
-        Try {
-            [DateTime]$DateString | Out-Null
-            Write-Output -inputobject $True
-        } Catch {
-            Write-Output -inputobject $False
+        foreach ($d in $DateString) {
+            Try {
+                write-verbose "The string you entered is [$DateString]"
+                [DateTime] $d | Out-Null
+                if ($IncludeInput) {
+                    new-object psobject -Property @{Input="$d";Result=$true; DateTime=[DateTime] $d}
+                } else {
+                    Write-Output -inputobject $True
+                }
+            } Catch {
+                if ($IncludeInput) {
+                    new-object psobject -Property @{Input="$d";Result=$false; DateTime=$null}
+                } else {
+                    Write-Output -inputobject $false
+                }
+            }
         }
     }
+#endregion Main
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 } #EndFunction Test-IsDate
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsDate'
-    $FuncAlias       = ''
-    $FuncDescription = 'Tests if passed parameter can resolve to a datetime datatype'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
-
-

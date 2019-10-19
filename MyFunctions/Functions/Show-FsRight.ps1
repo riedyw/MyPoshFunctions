@@ -61,27 +61,27 @@ DeleteSubdirectoriesAndFiles Single 0x00000040              64
 #endregion Parameter
 
     $returnVar = @()
-    $prop       = @{ Name = 'GenericRead' ; Dec = [uint64] '0x80000000'; Hex = '0x80000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'GenericRead' ; Dec = [uint64] '0x80000000'; Hex = '0x80000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $prop       = @{ Name = 'GenericWrite' ;  Dec = [uint64] '0x40000000'; Hex = '0x40000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'GenericWrite' ;  Dec = [uint64] '0x40000000'; Hex = '0x40000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $prop       = @{ Name = 'GenericExecute' ;  Dec = [uint64] '0x20000000'; Hex = '0x20000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'GenericExecute' ;  Dec = [uint64] '0x20000000'; Hex = '0x20000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $prop       = @{ Name = 'GenericAll' ;  Dec = [uint64] '0x10000000'; Hex = '0x10000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'GenericAll' ;  Dec = [uint64] '0x10000000'; Hex = '0x10000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $prop       = @{ Name = 'MaximumAllowed' ;  Dec = [uint64] '0x02000000'; Hex = '0x02000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'MaximumAllowed' ;  Dec = [uint64] '0x02000000'; Hex = '0x02000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $prop       = @{ Name = 'AccessSystemSecurity' ;  Dec = [uint64] '0x01000000'; Hex = '0x01000000'; Type = 'Combo' }
+    $prop       = @{ Name = 'AccessSystemSecurity' ;  Dec = [uint64] '0x01000000'; Hex = '0x01000000'; Type = 'Single' }
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
@@ -109,44 +109,12 @@ DeleteSubdirectoriesAndFiles Single 0x00000040              64
     $object     = New-Object -TypeName PSObject -Prop $prop
     $returnVar += $object
 
-    $returnVar += [System.Enum]::Getvalues([system.security.accesscontrol.filesystemrights]) |
+        $returnVar += [System.Enum]::Getvalues([system.security.accesscontrol.filesystemrights]) |
         select-object @{Name = 'Name'; Expression = {$_}},
             @{Name = 'Dec';     Expression = {[Int32] $_}},
             @{Name = 'Hex';     Expression = {"0x{0:X8}" -f [uint64] $_}},
-            @{Name = 'Type';    Expression = {'Single'}} |
+            @{Name = 'Type';    Expression = {if (("0x{0:X8}" -f [uint64] $_) -match '^0x0*\d0*$') {'Single'} else {'Combo'} }} |
             select-object name, dec, hex, type -unique
     $returnVar = $returnVar | sort-object -Property Dec
     write-output ($returnVar | select-object Name, Type, Hex, Dec)
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Show-FsRight'
-    $FuncAlias       = ''
-    $FuncDescription = 'To list all potential file system rights'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

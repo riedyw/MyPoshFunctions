@@ -31,58 +31,37 @@ Function Set-Numlock {
         [bool] $State = $true
     )
 
-    $CurrentState = Test-IsNumLock
-    $ShouldMessage = "NumLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($State.ToString().ToUpper())]"
-    If ($PSCmdlet.ShouldProcess($ShouldMessage))
-    {
-        if ($CurrentState -eq $true) {
-            write-verbose -Message 'Current state is TRUE'
-            if ($State -eq $false) {
-                write-verbose -Message 'Setting state to FALSE'
-                $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
-                $wShell.SendKeys("{NUMLOCK}")
-                remove-variable -name wShell
-            }
-        } else {
-            write-verbose -Message 'Current state is FALSE'
-            if ($State -eq $true) {
-                write-verbose -Message 'Setting state to TRUE'
-                $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
-                $wShell.SendKeys("{NUMLOCK}")
-                remove-variable -name wShell
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+    Process {
+        $CurrentState = Test-IsNumLock
+        $ShouldMessage = "NumLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($State.ToString().ToUpper())]"
+        If ($PSCmdlet.ShouldProcess($ShouldMessage))
+        {
+            if ($CurrentState -eq $true) {
+                write-verbose -Message 'Current state is TRUE'
+                if ($State -eq $false) {
+                    write-verbose -Message 'Setting state to FALSE'
+                    $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
+                    $wShell.SendKeys("{NUMLOCK}")
+                    remove-variable -name wShell
+                }
+            } else {
+                write-verbose -Message 'Current state is FALSE'
+                if ($State -eq $true) {
+                    write-verbose -Message 'Setting state to TRUE'
+                    $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
+                    $wShell.SendKeys("{NUMLOCK}")
+                    remove-variable -name wShell
+                }
             }
         }
     }
-} #EndFunction Set-Numlock
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-Numlock'
-    $FuncAlias       = ''
-    $FuncDescription = 'Sets the state of the [NumLock].'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} #EndFunction Set-Numlock

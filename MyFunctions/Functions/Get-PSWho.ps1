@@ -67,79 +67,60 @@ Function Get-PSWho {
 #>
     [CmdletBinding()]
     Param(
-      [switch]$AsString
+      [switch] $AsString
     )
-if ($PSVersionTable.PSEdition -eq "desktop" -OR $PSVersionTable.OS -match "Windows") {
-        #get some basic information about the operating system
-        $cimos = Get-CimInstance -classname win32_operatingsystem -Property Caption, Version,OSArchitecture
-        $os = "$($cimos.Caption) [$($cimos.OSArchitecture)]"
-        $osver = $cimos.Version
-        #determine the current user so we can test if the user is running in an elevated session
-        $current = [Security.Principal.WindowsIdentity]::GetCurrent()
-        $principal = [Security.Principal.WindowsPrincipal]$current
-        $Elevated = $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-        $user = $current.Name
-        $computer = $env:COMPUTERNAME
-    }
-    else {
-     #non-Windows values
-      $os = $PSVersionTable.OS
-      $lsb = lsb_release -d
-      $osver =   ($lsb -split ":")[1].Trim()
-      $elevated = "NA"
-      $user = $env:USER
-      $computer = $env:NAME
-    }
-    #object properties will be displayed in the order they are listed here
-    $who = [pscustomObject]@{
-        User            = $user
-        Elevated        = $elevated
-        Computername    = $computer
-        OperatingSystem = $os
-        OSVersion       = $osver
-        PSVersion       = $PSVersionTable.PSVersion.ToString()
-        Edition         = $PSVersionTable.PSEdition
-        PSHost          = $host.Name
-        WSMan           = $PSVersionTable.WSManStackVersion.ToString()
-        ExecutionPolicy = (Get-ExecutionPolicy)
-        Culture         = $host.CurrentCulture
-    }
-    if ($AsString) {
-      $who | Out-String
-    }
-    else {
-      $who
-    }
-} #EndFunction Get-PSWho
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-PSWho'
-    $FuncAlias       = ''
-    $FuncDescription = 'Gets information on current user'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        if ($PSVersionTable.PSEdition -eq "desktop" -OR $PSVersionTable.OS -match "Windows") {
+            #get some basic information about the operating system
+            $cimos = Get-CimInstance -classname win32_operatingsystem -Property Caption, Version,OSArchitecture
+            $os = "$($cimos.Caption) [$($cimos.OSArchitecture)]"
+            $osver = $cimos.Version
+            #determine the current user so we can test if the user is running in an elevated session
+            $current = [Security.Principal.WindowsIdentity]::GetCurrent()
+            $principal = [Security.Principal.WindowsPrincipal] $current
+            $Elevated = $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+            $user = $current.Name
+            $computer = $env:COMPUTERNAME
+        }
+        else {
+         #non-Windows values
+          $os = $PSVersionTable.OS
+          $lsb = lsb_release -d
+          $osver =   ($lsb -split ":")[1].Trim()
+          $elevated = "NA"
+          $user = $env:USER
+          $computer = $env:NAME
+        }
+        #object properties will be displayed in the order they are listed here
+        $who = [pscustomObject]@{
+            User            = $user
+            Elevated        = $elevated
+            Computername    = $computer
+            OperatingSystem = $os
+            OSVersion       = $osver
+            PSVersion       = $PSVersionTable.PSVersion.ToString()
+            Edition         = $PSVersionTable.PSEdition
+            PSHost          = $host.Name
+            WSMan           = $PSVersionTable.WSManStackVersion.ToString()
+            ExecutionPolicy = (Get-ExecutionPolicy)
+            Culture         = $host.CurrentCulture
+        }
+        if ($AsString) {
+            $who | Out-String
+        }
+        else {
+            $who
+        }
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+
+} #EndFunction Get-PSWho

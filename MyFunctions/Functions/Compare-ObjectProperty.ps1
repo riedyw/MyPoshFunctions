@@ -25,64 +25,35 @@ Function Compare-ObjectProperty {
         [PSObject] $ReferenceObject,
 
         [Parameter(Mandatory=$True,HelpMessage='Second object to compare',Position=1)]
-        [PSObject]$DifferenceObject
+        [PSObject] $DifferenceObject
     )
 #endregion Parameters
 
-    $objprops = $ReferenceObject | Get-Member -MemberType Property,NoteProperty | foreach-object Name
-    $objprops += $DifferenceObject | Get-Member -MemberType Property,NoteProperty | foreach-object Name
-    $objprops = $objprops | Sort-Object | Select-Object -Unique
-    $diffs = @()
-    foreach ($objprop in $objprops) {
-        $diff = Compare-Object $ReferenceObject $DifferenceObject -Property $objprop
-        if ($diff) {
-            $diffprops = @{
-                PropertyName=$objprop
-                RefValue=($diff | where-object {$_.SideIndicator -eq '<='} | foreach-object $($objprop))
-                DiffValue=($diff | where-object {$_.SideIndicator -eq '=>'} | foreach-object $($objprop))
-            }
-            $diffs += New-Object PSObject -Property $diffprops
-        }
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if ($diffs) {return ($diffs | Select-Object -Property PropertyName,RefValue,DiffValue)}
+
+    process {
+        $objprops = $ReferenceObject | Get-Member -MemberType Property,NoteProperty | foreach-object Name
+        $objprops += $DifferenceObject | Get-Member -MemberType Property,NoteProperty | foreach-object Name
+        $objprops = $objprops | Sort-Object | Select-Object -Unique
+        $diffs = @()
+        foreach ($objprop in $objprops) {
+            $diff = Compare-Object $ReferenceObject $DifferenceObject -Property $objprop
+            if ($diff) {
+                $diffprops = @{
+                    PropertyName=$objprop
+                    RefValue=($diff | where-object {$_.SideIndicator -eq '<='} | foreach-object $($objprop))
+                    DiffValue=($diff | where-object {$_.SideIndicator -eq '=>'} | foreach-object $($objprop))
+                }
+                $diffs += New-Object PSObject -Property $diffprops
+            }
+        }
+        if ($diffs) {return ($diffs | Select-Object -Property PropertyName,RefValue,DiffValue)}
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 }
-
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'Compare-ObjectProperty'
-$FuncAlias       = ''
-$FuncDescription = 'Function to compare the properties of one object versus another'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName
-    $AliasesToExport += $FuncAlias
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata

@@ -1,35 +1,26 @@
 Function Show-ShortDaysOfWeek {
-    Show-DaysOfWeek | foreach-object { $_.substring(0,3)}
-}
+<#
+.SYNOPSIS
+    Show short days of the week
+.DESCRIPTION
+    Show short days of the week
+.NOTES
+    Author:     Bill Riedy
+#>
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Show-ShortDaysOfWeek'
-    $FuncAlias       = ''
-    $FuncDescription = 'To list the short names for the days of the week'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    [cmdletbinding()]
+    Param ()
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        Show-DaysOfWeek | foreach-object { $_.substring(0,3)}
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+}

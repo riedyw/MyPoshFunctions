@@ -22,6 +22,7 @@ PS > Show-Object $ps
 
 #>
 
+    [cmdletbinding()]
     param(
         ## The object to examine
         [Parameter(ValueFromPipeline = $true)]
@@ -198,7 +199,7 @@ PS > Show-Object $ps
 
         ## And populate the node with the result object.
         PopulateNode $selectedNode $resultObject
-    }
+    } #endfunction OnBeforeExpand
 
     ## A function to handle keypresses on the form.
     ## In this case, we capture ^C to copy the path of
@@ -219,7 +220,7 @@ PS > Show-Object $ps
 
             $form.Close()
         }
-    }
+    } #endfunction OnKeyPress
 
     ## A function to walk through the parents of a node,
     ## creating virtual PowerShell syntax to access this property.
@@ -267,8 +268,7 @@ PS > Show-Object $ps
 
         ## And return the result
         $nodePath
-    }
-
+    } # endfunction GetPathForNode
     ## Create the TreeView, which will hold our object navigation
     ## area.
     $treeView = New-Object Windows.Forms.TreeView
@@ -310,36 +310,3 @@ PS > Show-Object $ps
     $null = $form.ShowDialog()
     $form.Dispose()
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Show-Object'
-    $FuncAlias       = ''
-    $FuncDescription = 'Displays an object out to GRIDVIEW'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
-

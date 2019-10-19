@@ -1,11 +1,13 @@
 Function Test-IsNumeric {
 <#
 .SYNOPSIS
-    blah
+    Determines if specified string can be parsed to a number
 .DESCRIPTION
-    blah blah
+    Determines if specified string can be parsed to a number. Can specify a string, an array of strings, or input from the pipeline
 .EXAMPLE
-    Test-IsCapsLock
+    Test-IsNumeric '1.2'
+
+    True
 .EXAMPLE
     Test-IsCapsLock -Verbose
 #>
@@ -15,54 +17,41 @@ Function Test-IsNumeric {
     Param (
         [parameter(ValueFromPipeLine=$True,ValueFromPipeLineByPropertyName=$True)]
         [Alias("Number")]
-        [string] $NumString
+        [string[]] $NumString,
+        [switch] $IncludeInput
     )
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
     Process {
-        $NumString = $NumString.Trim()
-        if (($NumString -eq '') -or ($NumString -eq $null)) {
-            $false
-        } else {
-            Try {
-                0 + $NumString | Out-Null
-                #[Helpers]::IsNumeric($NumString)
-                #[DateTime]$DateString | Out-Null
-                Write-Output -inputobject $True
-            } Catch {
-                Write-Output -inputobject $False
+        foreach ($n in $NumString) {
+            $n = $n.Trim()
+            if (($n -eq '') -or ($null -eq $n)) {
+                if ($IncludeInput) {
+                    new-object psobject -Property @{Input="$n";Result=$false}
+                } else {
+                    Write-Output -inputobject $false
+                }
+            } else {
+                Try {
+                    0 + $n | Out-Null
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$n";Result=$true}
+                    } else {
+                        Write-Output -inputobject $true
+                    }
+                } Catch {
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$n";Result=$false}
+                    } else {
+                        Write-Output -inputobject $false
+                    }
+                }
             }
         }
     }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 } #EndFunction Test-IsNumeric
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsNumeric'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines if what was passed is numeric'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
-

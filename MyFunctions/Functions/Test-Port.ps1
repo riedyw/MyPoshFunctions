@@ -14,10 +14,8 @@ Function Test-Port {
     Use TCP as the transport protocol
 .PARAMETER UDP
     Use UDP as the transport protocol
-.PARAMETER UDPTimeOut
-    Sets a timeout for UDP port query. (In milliseconds, Default is 1000)
-.PARAMETER TCPTimeOut
-    Sets a timeout for TCP port query. (In milliseconds, Default is 1000)
+.PARAMETER TimeOut
+    Sets a timeout for TCP or UDP port query. (In milliseconds, Default is 1000)
 .NOTES
     Author:     Bill Riedy
     Version:    1.0
@@ -79,10 +77,7 @@ Function Test-Port {
             [uint16[]] $Port,
         [Parameter(
             ParameterSetName = '')]
-            [int] $TCPtimeout=1000,
-        [Parameter(
-            ParameterSetName = '')]
-            [int] $UDPtimeout=1000,
+            [int] $Timeout=1000,
         [Parameter(
             ParameterSetName = '')]
             [switch] $TCP,
@@ -93,6 +88,7 @@ Function Test-Port {
     #endregion Parameter
     Begin
     {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
         If (!$tcp -AND !$udp)
         {
             $tcp = $True
@@ -119,7 +115,7 @@ Function Test-Port {
                     #Connect to remote machine's port
                     $connect = $tcpobject.BeginConnect($c,$p,$null,$null)
                     #Configure a timeout before quitting
-                    $wait = $connect.AsyncWaitHandle.WaitOne($TCPtimeout,$false)
+                    $wait = $connect.AsyncWaitHandle.WaitOne($Timeout,$false)
                     #If timeout
                     If(!$wait)
                     {
@@ -141,7 +137,7 @@ Function Test-Port {
                         If($error[0])
                         {
                             #Begin making error more readable in report
-                            [string]$string = ($error[0].exception).message
+                            [string] $string = ($error[0].exception).message
                             $message = (($string.split(':')[1]).replace('"','')).TrimStart()
                             $failed = $true
                         }
@@ -177,8 +173,8 @@ Function Test-Port {
                     $temp = '' | Select-Object -Property ComputerName, Protocol, Port, Open, Notes
                     write-verbose -Message 'Making UDP connection to remote server'
                     $Socket = New-Object -TypeName Net.Sockets.Socket( 'InterNetwork', 'Dgram', 'Udp' )
-                    $Socket.SendTimeOut    = $UDPTimeout  # ms
-                    $Socket.ReceiveTimeOut = $UDPTimeout  # ms
+                    $Socket.SendTimeOut    = $Timeout  # ms
+                    $Socket.ReceiveTimeOut = $Timeout  # ms
                     try
                     {
                         $Socket.Connect( $C, $p )
@@ -215,38 +211,7 @@ Function Test-Port {
         #Generate Report
         write-output -InputObject $report
         write-verbose -Message "Resetting value of `$ErrorActionPreference back to [$($oldEa)]"
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
         $ErrorActionPreference = $oldEA
     }
 } #EndFunction Test-Port
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-Port'
-    $FuncAlias       = ''
-    $FuncDescription = 'Tests a Port or a range of ports on a specific ComputerName'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

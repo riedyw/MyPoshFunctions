@@ -1,44 +1,34 @@
 Function ConvertTo-Base64 ($stringto) {
-    $bytesto  = [System.Text.Encoding]::Unicode.GetBytes($stringto);
-    $encodedto = [System.Convert]::ToBase64String($bytesto);
-    write-output $encodedto;
+<#
+.SYNOPSIS
+    ConvertTo-Base64 converts a normal string to a base 64 string
+.DESCRIPTION
+    ConvertTo-Base64 converts a normal string to a base 64 string
+.PARAMETER StringTo
+    The string you want manipulated
+.NOTES
+    Author:     Bill Riedy
+.OUTPUTS
+    [string]
+.LINK
+    about_Properties
+#>
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+    Process {
+
+        $bytesto  = [System.Text.Encoding]::Unicode.GetBytes($stringto)
+        $encodedto = [System.Convert]::ToBase64String($bytesto)
+        write-output $encodedto
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 }
 
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'ConvertTo-Base64'
-$FuncAlias       = 'Base64Encode'
-$FuncDescription = 'Converts an object to Base64 encoding.'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-    $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
+Set-Alias -Name 'Base64Encode' -Value 'ConvertTo-Base64' -Description 'Alias for ConvertTo-Base64'

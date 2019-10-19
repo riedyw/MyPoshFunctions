@@ -1,8 +1,5 @@
-# Source: https://gallery.technet.microsoft.com/ISE-Color-Theme-Cmdlets-24905f9e
-# get-help about_ISE-Color-Theme-Cmdlets for more information
-
 Function Convert-ARGBToHex {
-<#
+    <#
 .SYNOPSIS
     Converts an ARGB color string to hex equivalent
 .DESCRIPTION
@@ -44,97 +41,58 @@ Function Convert-ARGBToHex {
 .OUTPUTS
 [string]
 #>
-#region Parameters
+
+    #region Parameters
     [cmdletbinding()]
     [outputtype([string])]
     Param(
-        [parameter(Mandatory=$True,Position=0,ValueFromPipeline=$true)]
-        [ValidateScript( {
-            if ( $_ -match "^\d{1,3}\,\d{1,3}\,\d{1,3}\,\d{1,3}$")
-            {
-                $true
-            }
-            else
-            {
-                throw "You must provide an ARGB string value in the form '#,#,#,#' where each number is between 0 and 255"
-            }
-        })]
+        [parameter(Mandatory = $True, Position = 0, ValueFromPipeline = $true)]
         [string] $ARGB,
 
         [bool] $IncludeHash = $True
     )
-#endregion Parameters
-    Begin{}
+    #endregion Parameters
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
 
     Process {
+        write-verbose "`$ARGB = [$ARGB]"
+        $ARGB = $ARGB -replace ' ', ''
+        if ( $ARGB -match "^\d{1,3}\,\d{1,3}\,\d{1,3}\,\d{1,3}$") {
+            #$true
+        }
+        else {
+            if ( $ARGB -match "^\d{1,3}\,\d{1,3}\,\d{1,3}$") {
+                $ARGB = "0,$ARGB"
+                #$true
+            }
+            else {
+                throw "You must provide an ARGB string value in the form '#,#,#,#' where each number is between 0 and 255"
+            }
+        }
+        write-verbose "`$ARGB = [$ARGB]"
         #-separate the ARGB values
         $var_RGB = $ARGB.split(",")
 
         #-Convert values to Hex
-        $var_A = [Convert]::ToString($var_RGB[0], 16).ToUpper()
-        $var_R = [Convert]::ToString($var_RGB[1], 16).ToUpper()
-        $var_G = [Convert]::ToString($var_RGB[2], 16).ToUpper()
-        $var_B = [Convert]::ToString($var_RGB[3], 16).ToUpper()
-
-        #-pad single digit values to ensure 8 character Hex is returned
-        If ($var_A.Length -eq 1) {$var_A = "0$var_A"}
-        If ($var_R.Length -eq 1) {$var_R = "0$var_R"}
-        If ($var_G.Length -eq 1) {$var_G = "0$var_G"}
-        If ($var_B.Length -eq 1) {$var_B = "0$var_B"}
+        $var_A = [Convert]::ToString($var_RGB[0], 16).ToUpper().PadLeft(2, '0')
+        $var_R = [Convert]::ToString($var_RGB[1], 16).ToUpper().PadLeft(2, '0')
+        $var_G = [Convert]::ToString($var_RGB[2], 16).ToUpper().PadLeft(2, '0')
+        $var_B = [Convert]::ToString($var_RGB[3], 16).ToUpper().PadLeft(2, '0')
 
         #-Output concatenated hex value
-        if ($IncludeHash)
-        {
+        if ($IncludeHash) {
             Write-Output "#$var_A$var_R$var_G$var_B"
         }
-        else
-        {
+        else {
             Write-Output "$var_A$var_R$var_G$var_B"
         }
     }
 
-    End{}
-} #end function Convert-ARGBToHex
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 
-
-# Setting the Description property of the function.
-(get-childitem function:$funcName).set_Description($funcDescription)
-
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'Convert-ARGBToHex'
-$FuncAlias       = ''
-$FuncDescription = 'Converts ARGB to Hex values.'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName
-    $AliasesToExport += $FuncAlias
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
+} #EndFunction Convert-ARGBToHex

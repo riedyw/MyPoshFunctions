@@ -94,133 +94,103 @@ Function Parse-ComputerName {
 #endregion Parameter
 
 begin {
+    Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     $ValidPlatform       = '((LCS\d\d)|(LCS\d)|ITT2A|ITT2B|ITT2C|ITT2|(LDE\d))'
     $ValidPit            = '(CIN|UIN|CWS|HME|CNS|CCS)'
     write-verbose -Message "`$ValidPlatform=[$($ValidPlatform)]"
     write-verbose -Message "`$ValidPit=[$($ValidPit)]"
 }
 
-process {
-    write-verbose -Message "Computers specified are [$($computerName -join ', ')]"
-    foreach ($curComputerName in $ComputerName) {
-        write-verbose -Message "`$curComputerName=[$($curComputerName)]"
-        $FullRegEx = '^' + $ValidPlatform + $ValidPit + '(([0-9]|[A-Z])+)$'
-        write-verbose -Message "`$FullRegEx=[$($FullRegEx)]"
-        if ($curComputerName -match $FullRegEx) {
-            $Hull = $matches[1]
-            $Pit  = $matches[5]
-            $HostName = $matches[6]
-            switch ($case) {
-                'Upper' {
-                    write-verbose -Message 'Converting fields to uppercase'
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $true
-                        Hull         = $Hull.ToUpper()
-                        PIT          = $PIT.ToUpper()
-                        HostName     = $HostName.ToUpper()
-                        ParsedCN     = $curComputerName.ToUpper()
+    process {
+        write-verbose -Message "Computers specified are [$($computerName -join ', ')]"
+        foreach ($curComputerName in $ComputerName) {
+            write-verbose -Message "`$curComputerName=[$($curComputerName)]"
+            $FullRegEx = '^' + $ValidPlatform + $ValidPit + '(([0-9]|[A-Z])+)$'
+            write-verbose -Message "`$FullRegEx=[$($FullRegEx)]"
+            if ($curComputerName -match $FullRegEx) {
+                $Hull = $matches[1]
+                $Pit  = $matches[5]
+                $HostName = $matches[6]
+                switch ($case) {
+                    'Upper' {
+                        write-verbose -Message 'Converting fields to uppercase'
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $true
+                            Hull         = $Hull.ToUpper()
+                            PIT          = $PIT.ToUpper()
+                            HostName     = $HostName.ToUpper()
+                            ParsedCN     = $curComputerName.ToUpper()
+                        }
                     }
-                }
-                'Lower' {
-                    write-verbose -Message 'Converting fields to lowercase'
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $true
-                        Hull         = $Hull.ToLower()
-                        PIT          = $PIT.ToLower()
-                        HostName     = $HostName.ToLower()
-                        ParsedCN     = $curComputerName.ToLower()
+                    'Lower' {
+                        write-verbose -Message 'Converting fields to lowercase'
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $true
+                            Hull         = $Hull.ToLower()
+                            PIT          = $PIT.ToLower()
+                            HostName     = $HostName.ToLower()
+                            ParsedCN     = $curComputerName.ToLower()
+                        }
                     }
-                }
-                default {
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $true
-                        Hull         = $Hull
-                        PIT          = $PIT
-                        HostName     = $HostName
-                        ParsedCN     = $curComputerName
+                    default {
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $true
+                            Hull         = $Hull
+                            PIT          = $PIT
+                            HostName     = $HostName
+                            ParsedCN     = $curComputerName
+                        }
                     }
-                }
-            } # endSwitch
-            $obj = new-object -TypeName psobject -property $prop
-            # By default no control over order of field names so fixing with select-object
-            $obj | Select-Object -Property ComputerName, Valid, Hull, PIT, HostName, ParsedCN
-        } else {
-            switch ($case) {
-                'Upper' {
-                    write-verbose -Message 'Converting fields to uppercase'
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $false
-                        Hull         = ''
-                        PIT          = ''
-                        HostName     = $curComputerName.ToUpper()
-                        ParsedCN     = ''
+                } # endSwitch
+                $obj = new-object -TypeName psobject -property $prop
+                # By default no control over order of field names so fixing with select-object
+                $obj | Select-Object -Property ComputerName, Valid, Hull, PIT, HostName, ParsedCN
+            } else {
+                switch ($case) {
+                    'Upper' {
+                        write-verbose -Message 'Converting fields to uppercase'
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $false
+                            Hull         = ''
+                            PIT          = ''
+                            HostName     = $curComputerName.ToUpper()
+                            ParsedCN     = ''
+                        }
                     }
-                }
-                'Lower' {
-                    write-verbose -Message 'Converting fields to lowercase'
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $false
-                        Hull         = ''
-                        PIT          = ''
-                        HostName     = $curComputerName.ToLower()
-                        ParsedCN     = ''
+                    'Lower' {
+                        write-verbose -Message 'Converting fields to lowercase'
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $false
+                            Hull         = ''
+                            PIT          = ''
+                            HostName     = $curComputerName.ToLower()
+                            ParsedCN     = ''
+                        }
                     }
-                }
-                default {
-                    $Prop = @{
-                        ComputerName = $curComputerName
-                        Valid        = $false
-                        Hull         = ''
-                        PIT          = ''
-                        HostName     = $curComputerName
-                        ParsedCN     = ''
+                    default {
+                        $Prop = @{
+                            ComputerName = $curComputerName
+                            Valid        = $false
+                            Hull         = ''
+                            PIT          = ''
+                            HostName     = $curComputerName
+                            ParsedCN     = ''
+                        }
                     }
-                }
-            } # endSwitch
-            $obj = new-object -TypeName psobject -property $prop
-            $obj | Select-Object -Property ComputerName, Valid, Hull, PIT, HostName, ParsedCN
-        } # endElse
-    } # endForEach ($curComputerName in $ComputerName)
-  } # endProcess
-  end {
-    # No code needed here
-  }
+                } # endSwitch
+                $obj = new-object -TypeName psobject -property $prop
+                $obj | Select-Object -Property ComputerName, Valid, Hull, PIT, HostName, ParsedCN
+            } # endElse
+        } # endForEach ($curComputerName in $ComputerName)
+      } # endProcess
+
+    end {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 
 } # EndFunction Parse-ComputerName
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Parse-ComputerName'
-    $FuncAlias       = ''
-    $FuncDescription = 'Splits a computername based upon rules and tokenizes it'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

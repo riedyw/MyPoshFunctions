@@ -5,10 +5,10 @@ Function Import-ISEThemeFile {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)]
-        [object]$FileName,
+        [object] $FileName,
 
         [Parameter()]
-        [switch]$ApplyTheme
+        [switch] $ApplyTheme
     )
 
     Begin{}
@@ -16,13 +16,13 @@ Function Import-ISEThemeFile {
     Process {
         # Get fullname if gci object passed
         If ($FileName.FullName) {
-            [string]$FileName = $FileName.FullName
+            [string] $FileName = $FileName.FullName
         }
 
         #-Create xml variable from file name
-        [xml]$xml = get-content $FileName
+        [xml] $xml = get-content $FileName
         #Create xml string variable from file name
-        [string]$xmlString = get-content $FileName
+        [string] $xmlString = get-content $FileName
 
         #-Get theme name for registry value name
         $ThemeName = $xml.StorableColorTheme.Name
@@ -67,35 +67,3 @@ Function Import-ISEThemeFile {
             http://gallery.technet.microsoft.com/ISE-Color-Theme-Cmdlets-24905f9e
     #>
 } #end function Import-ISEThemeFile
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Import-ISEThemeFile'
-    $FuncAlias       = ''
-    $FuncDescription = 'Imports an ISE theme XML file into the registry.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

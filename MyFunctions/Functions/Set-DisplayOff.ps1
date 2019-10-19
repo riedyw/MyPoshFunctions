@@ -1,9 +1,25 @@
 # Turning off display http://community.idera.com/database-tools/powershell/powertips/b/tips/posts/turning-display-off-immediately
 # Turning on display  https://www.codeproject.com/Articles/11099/Turn-on-off-monitor
 
-function Set-DisplayOff
-{
-$code = @"
+function Set-DisplayOff {
+<#
+.SYNOPSIS
+    Set-DisplayOff turns the display off via energy saver api
+.DESCRIPTION
+    Set-DisplayOff turns the display off via energy saver api
+.NOTES
+    Author:     Bill Riedy
+#>
+
+    [cmdletbinding()]
+    Param ()
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+    Process {
+    $code = @"
 using System;
 using System.Runtime.InteropServices;
 public class API
@@ -13,38 +29,22 @@ public class API
   int SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
 }
 "@
-    $t = Add-Type -TypeDefinition $code -PassThru
-    [void] $t::SendMessage(0xffff, 0x0112, 0xf170, 2)
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-DisplayOff'
-    $FuncAlias       = ''
-    $FuncDescription = 'Turns monitor off through power management.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+        $version = get-ciminstance win32_operatingsystem
+
+        if ($version.version -match '^10') {
+            start-process (join-path $env:windir -childpath 'System32\scrnsave.scr') -argumentlist '/s'
+        }
+        else {
+            $t = Add-Type -TypeDefinition $code -PassThru
+            start-sleep -seconds 1
+            [void] $t::SendMessage(0xffff, 0x0112, 0xf170, 2)
+        }
+
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+}

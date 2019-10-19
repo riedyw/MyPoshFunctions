@@ -1,35 +1,29 @@
 Function mklink {
+<#
+.SYNOPSIS
+    Mklink calls out to the Command Prompt (cmd.exe) and creates a link
+.DESCRIPTION
+    Mklink calls out to the Command Prompt (cmd.exe) and creates a link
+mklink /?
+Creates a symbolic link.
+
+MKLINK [[/D] | [/H] | [/J]] Link Target
+
+        /D      Creates a directory symbolic link.  Default is a file
+                symbolic link.
+        /H      Creates a hard link instead of a symbolic link.
+        /J      Creates a Directory Junction.
+        Link    Specifies the new symbolic link name.
+        Target  Specifies the path (relative or absolute) that the new link
+                refers to.
+.NOTES
+    Author:     Bill Riedy
+    Passes all command line arguments to cmd.exe embedded command mklink
+.EXAMPLE
+    mklink LINK REALFILE
+
+    would return
+    symbolic link created for link <<===>> realfile
+#>
     cmd.exe /c mklink $args
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'mklink'
-    $FuncAlias       = ''
-    $FuncDescription = 'To call Command Prompt mklink function'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

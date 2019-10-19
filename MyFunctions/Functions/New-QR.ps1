@@ -151,7 +151,7 @@ function New-QR {
         Mandatory=$false,
         Position=1,
         ValueFromPipelineByPropertyName = $true)]
-        [string]$fileName="$env:temp\QR.png",
+        [string] $fileName="$env:temp\QR.png",
 
         [Parameter(
         Mandatory=$false,
@@ -163,13 +163,17 @@ function New-QR {
         Position=0,
         HelpMessage="Message to be encoded",
         ValueFromPipelineByPropertyName = $true)]
-        [object]$Message,
+        [object] $Message,
 
         [Parameter(
         Mandatory=$false,
         ValueFromPipeline=$false)]
         $Size = "M"
     )
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
 
     process
     {
@@ -253,7 +257,7 @@ function New-QR {
         {
             $reader = $res.GetResponseStream()
             try {$writer = new-object System.IO.FileStream $fileName, "Create"}catch{Write-error "Invalid File Path?"; break}
-            [byte[]]$buffer = new-object byte[] 4096
+            [byte[]] $buffer = new-object byte[] 4096
 
             do
             {
@@ -287,44 +291,9 @@ function New-QR {
 
         $res.Close()
     }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 }
-
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'New-QR'
-$FuncAlias       = ''
-$FuncDescription = 'Create New Quick Response Code'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName
-    $AliasesToExport += $FuncAlias
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
-

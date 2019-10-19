@@ -33,7 +33,7 @@ Comment Based Help goes here
         )
 
     begin {
-        # nothing here for now
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
         }
 
     process
@@ -101,39 +101,7 @@ Comment Based Help goes here
         } # end >> process {}
 
     end {
-        # nothing here for now
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
         }
 
 } # end >> function Get-TruncatedDate
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-TruncatedDate'
-    $FuncAlias       = ''
-    $FuncDescription = 'Returns a truncated date value'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

@@ -1,9 +1,3 @@
-
-# Inspired and based on Clean-MacAddress.ps1 by
-# Francois-Xavier Cat
-# www.lazywinadmin.com
-# @lazywinadm
-
 function Format-MacAddress {
 <#
 .SYNOPSIS
@@ -108,6 +102,7 @@ function Format-MacAddress {
 
     begin {
         if ($Separator -eq 'Space') { $Separator = ' ' }
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
 
     process {
@@ -154,39 +149,7 @@ function Format-MacAddress {
     } #EndBlock Process
 
     end {
-        #Write-Output $MacAddress
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
 
 } #EndFunction Format-MacAddress
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Format-MacAddress'
-    $FuncAlias       = ''
-    $FuncDescription = 'Function to cleanup a MACAddress string'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

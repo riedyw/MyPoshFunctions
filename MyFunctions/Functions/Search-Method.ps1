@@ -1,5 +1,13 @@
 
-function Search-Method([Type]$parameterType, $namespace) {
+function Search-Method([Type] $parameterType, $namespace) {
+<#
+.SYNOPSIS
+    Search method
+.DESCRIPTION
+    Search method
+.NOTES
+    Author:     Bill Riedy
+#>
     Get-Type |
     Where-Object { $_.Namespace -like "*$namespace*" } |
     Where-Object {
@@ -58,7 +66,7 @@ Looking at this, I can see that constructors contain a GetParameters() method.
 Let's put that together with Get-Type to build something that will find all of
 the types that I can build using that type.
 
-function Search-Constructor([Type]$parameterType, $namespace) {
+function Search-Constructor([Type] $parameterType, $namespace) {
     Get-Type |
     Where-Object { $_.Namespace -like "*$namespace*" } |
     Where-Object {
@@ -78,7 +86,7 @@ but you can easily use this to start discovering how .NET types interact.
 
 Similar functions will let you find Properties, Events, and Methods:
 
-function Search-Method([Type]$parameterType, $namespace) {
+function Search-Method([Type] $parameterType, $namespace) {
     Get-Type |
     Where-Object { $_.Namespace -like "*$namespace*" } |
     Where-Object {
@@ -111,35 +119,3 @@ James Brundage [MSFT]
 
 Pasted from <https://blogs.msdn.microsoft.com/mediaandmicrocode/2008/10/23/microcode-powershell-scripting-tricks-exploring-net-types-with-a-get-type-function-and-reflection/>
  #>
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Search-Method'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines search method'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

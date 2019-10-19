@@ -1,13 +1,12 @@
 # source: https://gist.github.com/jpoehls/2406504
-function Get-FileEncoding
-{
+function Get-FileEncoding {
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
-    [string]$Path
+    [string] $Path
   )
 
-  [byte[]]$byte = get-content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
+  [byte[]] $byte = get-content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
   #Write-Host Bytes: $byte[0] $byte[1] $byte[2] $byte[3]
 
   # EF BB BF (UTF8)
@@ -57,35 +56,3 @@ function Get-FileEncoding
   else
   { Write-Output -inputobject 'ASCII' }
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-FileEncoding'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines encoding of file'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

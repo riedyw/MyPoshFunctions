@@ -1,44 +1,48 @@
-Function ConvertFrom-Base64 ($stringfrom) {
-    $bytesfrom  = [System.Convert]::FromBase64String($stringfrom);
-    $decodedfrom = [System.Text.Encoding]::Unicode.GetString($bytesfrom);
-    write-output $decodedfrom
+Function ConvertFrom-Base64 {
+<#
+.SYNOPSIS
+    Convert from a Base64 string to normal string
+.DESCRIPTION
+    Convert from a Base64 string to normal string
+.PARAMETER StringFrom
+    A base64 encoded string
+.NOTES
+    Author:     Bill Riedy
+    Version:    1.0
+.EXAMPLE
+    ConvertFrom-Base64 "SABlAGwAbABvAA=="
+
+    Would return
+    Hello
+.OUTPUTS
+    [string]
+.LINK
+    about_Properties
+#>
+
+#region Parameter
+    [cmdletbinding()]
+    Param(
+        [Parameter(Position=0,Mandatory=$True,ValueFromPipeLine=$True)]
+        [string] $StringFrom
+    )
+#endregion Parameter
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    Process {
+        $bytesfrom  = [System.Convert]::FromBase64String($stringfrom);
+        $decodedfrom = [System.Text.Encoding]::Unicode.GetString($bytesfrom);
+        write-output $decodedfrom
+
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 }
 
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'ConvertFrom-Base64'
-$FuncAlias       = 'Base64Decode'
-$FuncDescription = 'Function to convert a string or array of strings from Base64 encoding.'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-    $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
+Set-Alias -Name 'Base64Decode' -Value 'ConvertFrom-Base64' -Description 'Alias for ConvertFrom-Base64'

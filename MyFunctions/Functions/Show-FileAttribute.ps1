@@ -1,44 +1,44 @@
 Function Show-FileAttribute {
-    $datatype = 'System.IO.FileAttributes'
-    [enum]::GetNames($datatype)
+<#
+.SYNOPSIS
+    Shows the available file attributes
+.DESCRIPTION
+    Shows the available file attributes
+.NOTES
+    Author:     Bill Riedy
+.OUTPUTS
+    [string[]]
+#>
+
+    [cmdletbinding()]
+    [outputtype([string[]])]
+    Param (
+    [switch] $IncludeValue
+    )
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
+
+    Process {
+        $datatype = 'System.IO.FileAttributes'
+        if (-not $IncludeValue) {
+            [enum]::GetNames($datatype)
+        }
+        else {
+            [enum]::Getvalues($datatype) |
+            foreach-object {
+                [pscustomobject] @{
+                    Name = $_.toString()
+                    Dec = $_.value__
+                    Hex = "0x{0:x}" -f ($_.value__)
+                }
+            }
+        }
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
+
 }
-
-#region Metadata
-# These variables are used to set the Description property of the function.
-# and whether they are meant to be exported
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-
-$FuncName        = 'Show-FileAttribute'
-$FuncAlias       = ''
-$FuncDescription = 'Lists all the possible assignable attributes to a file'
-$FuncVarName     = ''
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName
-    $AliasesToExport += $FuncAlias
-}
-
-if ($FuncVarName)
-{
-    $VariablesToExport += $FuncVarName
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
-

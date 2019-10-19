@@ -1,50 +1,97 @@
 Function Test-IsHexString {
 <#
 .SYNOPSIS
-    blah
+    Tests to determine if a string is a valid hexadecimal number. Can optionally include a prefix of '0x' or '#'
 .DESCRIPTION
-    blah blah
+    Tests to determine if a string is a valid hexadecimal number. Can optionally include a prefix of '0x' or '#'. Can accept a string, an array of strings, or pipeline input.
 .EXAMPLE
-    Test-IsCapsLock
+    Test-IsHexString '123abc'
+
+    True
 .EXAMPLE
-    Test-IsCapsLock -Verbose
+    Test-IsHexString 'lmnop'
+
+    False
+.EXAMPLE
+    test-ishexstring @('0x1','#1abcdef','3c') -IncludeInput  -AllowPrefix
+
+    Input    AllowPrefix Result
+    -----    ----------- ------
+    0x1             True   True
+    #1abcdef        True   True
+    3c              True   True
+.EXAMPLE
+    Test-IsHexString '123abc' -Verbose
+
+    VERBOSE: $h is [123abc]
+    True
 #>
 
     [CmdletBinding()]
     [OutputType([bool])]
-    Param()
+    Param (
+        [parameter(ValueFromPipeLine=$True,ValueFromPipeLineByPropertyName=$True)]
+        [Alias("Hex")]
+        [string[]] $HexString,
+        [switch] $IncludeInput,
+        [switch] $AllowPrefix
+    )
 
-    $x = $args[0] ; $y=$x.length ; $x -match "[0123456789abcdef]{$y}"
+    begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+        $regexPrefix = '^(#|0x)?[0-9,a-f]*$'
+        $regexNoPrefix = '^[0-9,a-f]*$'
+        write-verbose "`$regexPrefix is [$regexPrefix]"
+        write-verbose "`$regexNoPrefix is [$regexNoPrefix]"
+        write-verbose "`$AllowPrefix is $AllowPrefix"
+        write-verbose "`$IncludeInput is $IncludeInput"
+    }
+
+    Process {
+        foreach ($h in $HexString) {
+            $h = $h.Trim()
+            write-verbose "`$h is [$h]"
+            if ($AllowPrefix) {
+                if ($h -match $regexPrefix) {
+                    write-verbose 'match'
+                    $n = [convert]::ToInt32(($h -replace '^(0x|#)', ''),16)
+                    write-verbose "`$n is [$n]"
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$h"; AllowPrefix=$true; Result=$true; Decimal=$n} | select-object Input, AllowPrefix, Result, Decimal
+                    } else {
+                        Write-Output -inputobject $true
+                    }
+                } else {
+                    write-verbose 'no match'
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$h"; AllowPrefix=$true; Result=$false; Decimal=$null} | select-object Input, AllowPrefix, Result, Decimal
+                    } else {
+                        Write-Output -inputobject $false
+                    }
+                }
+            } else {
+                if ($h -match $regexNoPrefix) {
+                    write-verbose 'match'
+                    $n = [convert]::ToInt32(($h -replace '^(0x|#)', ''),16)
+                    write-verbose "`$n is [$n]"
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$h"; AllowPrefix=$false; Result=$true; Decimal=$n} | select-object Input, AllowPrefix, Result, Decimal
+                    } else {
+                        Write-Output -inputobject $true
+                    }
+                } else {
+                    write-verbose 'no match'
+                    if ($IncludeInput) {
+                        new-object psobject -Property @{Input="$h"; AllowPrefix=$false; Result=$false; Decimal = $null} | select-object Input, AllowPrefix, Result, Decimal
+                    } else {
+                        Write-Output -inputobject $false
+                    }
+                }
+            }
+        }
+    }
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    }
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsHexString'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines if a string is a Hex'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

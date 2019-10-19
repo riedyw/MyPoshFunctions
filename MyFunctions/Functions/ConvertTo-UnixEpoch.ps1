@@ -42,42 +42,22 @@ Function ConvertTo-UnixEpoch {
                     Position=0)]
         [datetime] $DateTime
     )
-    write-verbose "You entered a Local Time of:  '$DateTime'"
-    $BeginUnixEpoch = get-date "1/1/1970"
-    write-verbose "The beginning of a Unix Epoch is: '$BeginUnixEpoch'"
-    $UnixEpoch = [timespan] ($DateTime - $BeginUnixEpoch)
-    write-verbose "The date '$DateTime' is $($UnixEpoch.TotalSeconds) seconds in the future of '$BeginUnixEpoch'"
-    write-output $UnixEpoch.TotalSeconds
-} #EndFunction ConvertTo-UnixEpoch
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-UnixEpoch'
-    $FuncAlias       = ''
-    $FuncDescription = "Converts a datetime to a UnixEpoch which is the number of seconds since '1/1/1970 12:00:00 AM'"
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    process {
+        write-verbose "You entered a Local Time of:  '$DateTime'"
+        $BeginUnixEpoch = get-date "1/1/1970"
+        write-verbose "The beginning of a Unix Epoch is: '$BeginUnixEpoch'"
+        $UnixEpoch = [timespan] ($DateTime - $BeginUnixEpoch)
+        write-verbose "The date '$DateTime' is $($UnixEpoch.TotalSeconds) seconds in the future of '$BeginUnixEpoch'"
+        write-output $UnixEpoch.TotalSeconds
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
+} #EndFunction ConvertTo-UnixEpoch

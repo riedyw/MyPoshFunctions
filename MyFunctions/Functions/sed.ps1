@@ -1,33 +1,39 @@
-Filter sed ($before,$after) { foreach-object {$_ -replace $before,$after} }
+Filter sed {
+<#
+.SYNOPSIS
+    A simple text filter to replace strings
+.DESCRIPTION
+    A simple text filter to replace strings
+.PARAMETER Before
+    The string searching for
+.PARAMETER After
+    The string to replace it with
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    'Hello There' | sed 'Hello' 'Goodbye'
+    Would return
+    Goodbye There
+.OUTPUTS
+    [string]
+.LINK
+    about_Functions
+#>
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'sed'
-    $FuncAlias       = 'Sedify'
-    $FuncDescription = 'Replaces text in a string'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+#region Parameter
+    [cmdletbinding()]
+    [OutputType([string])]
+    Param(
+        [Parameter(Mandatory = $True, HelpMessage = 'Enter a string to search for', Position = 0, ValueFromPipeline = $False)]
+        [string] $Before,
+
+        [Parameter(Mandatory = $True, HelpMessage = 'Enter a string to replace it with', Position = 1, ValueFromPipeline = $False)]
+        [string] $After
+
+    )
+#endregion Parameter
+
+    foreach-object {
+        $_ -replace $before,$after
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-        $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+}

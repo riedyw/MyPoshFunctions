@@ -32,8 +32,7 @@ Get-Content -Path .\catencoded.txt |
 
 #>
 
-function ConvertTo-UuEncoding
-{
+function ConvertTo-UuEncoding {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -41,95 +40,76 @@ function ConvertTo-UuEncoding
         $Path
     )
 
-    try
-    {
-        $item = Get-Item -LiteralPath $Path -ErrorAction Stop
-        if ($item -isnot [System.IO.FileInfo])
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    } #close begin block
+
+    process {
+        try
         {
-            throw "Path '$Path' does not refer to a valid file."
+            $item = Get-Item -LiteralPath $Path -ErrorAction Stop
+            if ($item -isnot [System.IO.FileInfo])
+            {
+                throw "Path '$Path' does not refer to a valid file."
+            }
         }
-    }
-    catch
-    {
-        throw
-    }
-
-    $fileBuilder = New-Object System.Text.StringBuilder
-
-    $null = $fileBuilder.Append("begin 666 $($item.Name)`n")
-
-    $lineBuilder = New-Object System.Text.StringBuilder
-    $lineBytes = 0
-
-    Get-Content -LiteralPath $Path -Encoding Byte -ReadCount 3 |
-    ForEach-Object {
-        $bytes = $_
-
-        $lineBytes += $bytes.Count
-
-        $int = [int]0
-
-        for ($i = 0; $i -lt $bytes.Count; $i++)
+        catch
         {
-            $int += (([int]$bytes[$i]) -shl (8 * (2 - $i)))
+            throw
         }
 
-        $null = $lineBuilder.Append([char](32 + (($int -shr 18) -band 0x3F)))
-        $null = $lineBuilder.Append([char](32 + (($int -shr 12) -band 0x3F)))
-        $null = $lineBuilder.Append([char](32 + (($int -shr 6) -band 0x3F)))
-        $null = $lineBuilder.Append([char](32 + ($int -band 0x3F)))
+        $fileBuilder = New-Object System.Text.StringBuilder
 
-        if ($lineBytes -ge 45)
+        $null = $fileBuilder.Append("begin 666 $($item.Name)`n")
+
+        $lineBuilder = New-Object System.Text.StringBuilder
+        $lineBytes = 0
+
+        Get-Content -LiteralPath $Path -Encoding Byte -ReadCount 3 |
+        ForEach-Object {
+            $bytes = $_
+
+            $lineBytes += $bytes.Count
+
+            $int = [int]0
+
+            for ($i = 0; $i -lt $bytes.Count; $i++)
+            {
+                $int += (([int] $bytes[$i]) -shl (8 * (2 - $i)))
+            }
+
+            $null = $lineBuilder.Append([char](32 + (($int -shr 18) -band 0x3F)))
+            $null = $lineBuilder.Append([char](32 + (($int -shr 12) -band 0x3F)))
+            $null = $lineBuilder.Append([char](32 + (($int -shr 6) -band 0x3F)))
+            $null = $lineBuilder.Append([char](32 + ($int -band 0x3F)))
+
+            if ($lineBytes -ge 45)
+            {
+                $null = $lineBuilder.Append("`n")
+                $null = $lineBuilder.Insert(0, [char](32 + $lineBytes))
+                $null = $fileBuilder.Append($lineBuilder.ToString())
+
+                $lineBuilder.Length = 0
+                $lineBytes = 0
+            }
+        }
+
+        if ($lineBuilder.Length -gt 0)
         {
             $null = $lineBuilder.Append("`n")
             $null = $lineBuilder.Insert(0, [char](32 + $lineBytes))
             $null = $fileBuilder.Append($lineBuilder.ToString())
-
-            $lineBuilder.Length = 0
-            $lineBytes = 0
         }
-    }
 
-    if ($lineBuilder.Length -gt 0)
-    {
-        $null = $lineBuilder.Append("`n")
-        $null = $lineBuilder.Insert(0, [char](32 + $lineBytes))
-        $null = $fileBuilder.Append($lineBuilder.ToString())
-    }
+        $null = $fileBuilder.Append("```nend`n")
 
-    $null = $fileBuilder.Append("```nend`n")
+        $fileBuilder.ToString()
+    } # end process block
 
-    $fileBuilder.ToString()
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
+    } #close end block
+
 }
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'ConvertTo-UuEncoding'
-    $FuncAlias       = 'UuEncode'
-    $FuncDescription = 'Converts a datafile to UU encoding.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-        $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+Set-Alias -Name 'UuEncode' -Value 'ConvertTo-UuEncoding'

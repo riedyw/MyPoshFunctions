@@ -30,47 +30,27 @@ Function Set-Speaker {
         [ValidateRange(0,100)]
         [int] $Volume
     )
-    write-verbose -Message "You specified the speaker volume should be $Volume%"
-    if (($Volume % 2) -ne 0) {
-        $Volume = $Volume - 1
-        write-verbose -Message "Rounding down to $Volume%"
-    }
-    [int] $workingVolume = [math]::floor($Volume / 2)
-    $wshShell = new-object -ComObject wscript.shell
-    write-verbose -Message 'Turning volume down to 0%'
-    1..50 | foreach-object -Process {$wshShell.SendKeys([char]174)}
-    write-verbose -Message "Turning volume up to $Volume%"
-    1..$workingVolume | foreach-object -Process {$wshShell.SendKeys([char]175)}
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Set-Speaker'
-    $FuncAlias       = ''
-    $FuncDescription = 'Sets speaker percentage level'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        write-verbose -Message "You specified the speaker volume should be $Volume%"
+        if (($Volume % 2) -ne 0) {
+            $Volume = $Volume - 1
+            write-verbose -Message "Rounding down to $Volume%"
+        }
+        [int] $workingVolume = [math]::floor($Volume / 2)
+        $wshShell = new-object -ComObject wscript.shell
+        write-verbose -Message 'Turning volume down to 0%'
+        1..50 | foreach-object -Process {$wshShell.SendKeys([char]174)}
+        write-verbose -Message "Turning volume up to $Volume%"
+        1..$workingVolume | foreach-object -Process {$wshShell.SendKeys([char]175)}
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+}

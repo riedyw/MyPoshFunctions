@@ -1,9 +1,9 @@
 Function Test-IsCapsLock {
 <#
 .SYNOPSIS
-    blah
+    Determines if the CapsLock key is on or not
 .DESCRIPTION
-    blah blah
+    Determines if the CapsLock key is on or not
 .EXAMPLE
     Test-IsCapsLock
 .EXAMPLE
@@ -20,38 +20,16 @@ System.Console
     Param()
 #endregion Parameter
 
-    write-verbose -Message 'Determining the state of [CapsLock]'
-    [System.Console]::CapsLock
-}
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+    }
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsCapsLock'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines state of [CapsLock]'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    process {
+        write-verbose -Message 'Determining the state of [CapsLock]'
+        [System.Console]::CapsLock
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+}

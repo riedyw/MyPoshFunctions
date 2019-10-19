@@ -29,9 +29,9 @@ try {
     $Updateht.GalVersion = $GalMod.Version
   }
   # here - find module could not find the module in the gallery
-Catch {   
+Catch {
    # If module isn't in the gallery
-  $Updateht.GalVersion = [System.Version]::new(0,0)  
+  $Updateht.GalVersion = [System.Version]::new(0,0)
   }
 
 # now emit the object
@@ -42,13 +42,13 @@ New-Object -TypeName PSObject -Property $UpdateHt
 $End = Get-Date
 Write-Verbose "Stopped at: [$End]"
 Write-Verbose "Took $(($End-$Start).TotalSeconds) seconds"
-   
+
 } # End Function
 
 # $modver = Get-ModuleVersionInformation
 # $modver | where { $_.version -lt $_.galversion }
 
-<# 
+<#
 $zero = [System.Version]::new(0,0)
 foreach ($mod in $mods) {
   If ($mod.galversion -eq $zero) {
@@ -67,35 +67,3 @@ $msg
 } # End foreach
 
  #>
- 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-ModuleVersionInformation'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines module version information and determines if they are PowershellGallery'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

@@ -1,35 +1,62 @@
-Filter Remove-BlankOrComment ($string) {
-    $_ | where-object { $_ -notmatch '^[\s]*#' -and $_ -notmatch '^[\s]*$' }
-}
+Filter Remove-BlankOrComment {
+<#
+.SYNOPSIS
+    A simple text filter to remove blank lines or lines that begin with a comment character '#'
+.DESCRIPTION
+    A simple text filter to remove blank lines or lines that begin with a comment character '#'
+.PARAMETER String
+    The input string
+.NOTES
+    Author:     Bill Riedy
+.EXAMPLE
+    '#Hello','','There' | Remove-BlankOrComment
+    Would return:
+    There
+.EXAMPLE
+    Remove-BlankOrComment -verbose
+    Would return:
+    VERBOSE: No input
+.EXAMPLE
+    '#Hello','','There' | Remove-BlankOrComment -verbose
+    VERBOSE: Line 1 is [#Hello]
+    VERBOSE: Line 2 is []
+    VERBOSE: Line 3 is [There]
+.OUTPUTS
+    [string]
+.LINK
+    about_Functions
+#>
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Remove-BlankOrComment'
-    $FuncAlias       = ''
-    $FuncDescription = 'Remove lines that are blank, or filled with whitespace (space, tab), and any line where the # character is the first non whitespace character in the line'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+#region Parameter
+    [cmdletbinding()]
+    [OutputType([string])]
+    Param(
+        [Parameter(Position = 0, ValueFromPipeline = $True)]
+        [string[]] $String
+    )
+#endregion Parameter
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+        $Line = 0
+        $Count = 0
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        foreach ($s in $String) {
+            $Line ++
+            $Count ++
+            write-verbose "Line $Line is [$($s)]"
+            if ($s) {
+                $s | where-object { $_ -notmatch '^[\s]*#' -and $_ -notmatch '^[\s]*$' }
+            }
+        }
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        if (-not $Count) {
+            write-verbose "No input"
+        }
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+}

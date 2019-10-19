@@ -19,8 +19,8 @@ function Get-SharePermission {
     An array of objects containing the fields ComputerName, ShareName, Domain, ID, AccessMask, AceType
 #>
     [cmdletbinding()]
-    param([string]$sharename)
-    $ShareSec = Get-WmiObject -Class Win32_LogicalShareSecuritySetting
+    param([string] $sharename)
+    $ShareSec = Get-CimInstance -Class Win32_LogicalShareSecuritySetting
     ForEach ($ShareS in ($ShareSec | Where-object {$_.Name -eq $sharename}))
     {
         $SecurityDescriptor = $ShareS.GetSecurityDescriptor()
@@ -59,35 +59,3 @@ function Get-SharePermission {
     }
     Return $myCol
 } #EndFunction Get-SharePermission
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-SharePermission'
-    $FuncAlias       = ''
-    $FuncDescription = 'Gets share permissions'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

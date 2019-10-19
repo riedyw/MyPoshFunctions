@@ -1,4 +1,12 @@
 # inspired by: https://stackoverflow.com/questions/45953778/how-to-use-powershell-to-extract-data-from-dll-or-exe-files
+#
+# in desktop.ini in 'My Documents' folder
+#
+#[.ShellClassInfo]
+#LocalizedResourceName=@%SystemRoot%\system32\windows.storage.dll,-21770
+#@%SystemRoot%\system32\windows.storage.dll,-21770
+#resolves to
+#Documents
 
 function Get-StringResource {
     #region Parameter
@@ -6,19 +14,19 @@ function Get-StringResource {
         DefaultParameterSetName = '',
         ConfirmImpact = 'low'
     )]
-    [OutputType([string[]])]
+    [OutputType([System.Object[]])]
     Param(
         [Parameter(
             Mandatory = $True,
-            HelpMessage = 'Enter a ComputerName or IP address',
+            HelpMessage = 'Enter a resource string in the form "^@[\x20-\x7f]+,-\d+$"',
             Position = 0,
             ParameterSetName = '',
             ValueFromPipeline = $True)
             ]
+            [ValidatePattern('^@[\x20-\x7f]+,-\d+$')]
             [string[]] $ResourceName,
         [Parameter(
             Position = 1,
-            HelpMessage = 'Enter an integer port number (1-65535)',
             ParameterSetName = '')]
             [switch] $IncludeOriginal
         )
@@ -84,35 +92,3 @@ end {
 }
 
 }
-
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Get-StringResource'
-    $FuncAlias       = ''
-    $FuncDescription = 'Gets a string resource that is referenced in registry or INI file.'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
-    }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
-    }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
-    }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata

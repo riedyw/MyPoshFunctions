@@ -54,19 +54,21 @@ Function New-Popup {
     "Exclamation"
     "Information"
     "None"
+.PARAMETER  ShowOnTop
+    Switch which will force the popup window to appear on top of all other windows.
 .INPUTS
     None
 .OUTPUTS
     An integer with the following value depending upon the button pushed.
 
-    Null   = -1    # Value when timer finishes countdown.
-    OK     =  1
-    Cancel =  2
-    Abort  =  3
-    Retry  =  4
-    Ignore =  5
-    Yes    =  6
-    No     =  7
+    Timeout = -1    # Value when timer finishes countdown.
+    OK      =  1
+    Cancel  =  2
+    Abort   =  3
+    Retry   =  4
+    Ignore  =  5
+    Yes     =  6
+    No      =  7
 .LINK
     Wscript.Shell
 #>
@@ -90,73 +92,83 @@ Function New-Popup {
         [Parameter(Position=3)]
         [ValidateNotNullorEmpty()]
         [ValidateSet("OK","OKCancel","AbortRetryIgnore","YesNo","YesNoCancel","RetryCancel")]
-        [string]$Buttons="OK",
+        [string] $Buttons="OK",
 
         [Parameter(Position=4)]
         [ValidateNotNullorEmpty()]
         [ValidateSet("Stop","Question","Exclamation","Information","None" )]
-        [string]$Icon="Information"
+        [string] $Icon="None",
+
+        [Parameter(Position=5)]
+        [switch] $ShowOnTop
     )
 #endregion Parameters
 
-    #convert buttons to their integer equivalents
-    Switch ($Buttons) {
-        "OK"               {$ButtonValue = 0}
-        "OKCancel"         {$ButtonValue = 1}
-        "AbortRetryIgnore" {$ButtonValue = 2}
-        "YesNo"            {$ButtonValue = 4}
-        "YesNoCancel"      {$ButtonValue = 3}
-        "RetryCancel"      {$ButtonValue = 5}
-    }
-    #set an integer value for Icon type
-    Switch ($Icon) {
-        "Stop"        {$iconValue = 16}
-        "Question"    {$iconValue = 32}
-        "Exclamation" {$iconValue = 48}
-        "Information" {$iconValue = 64}
-        "None"        {$iconValue = 0}
-    }
-    #create the COM Object
-    Try {
-        $wshell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
-        #Button and icon type values are added together to create an integer value
-        $wshell.Popup($Message,$Time,$Title,$ButtonValue+$iconValue)
-    }
-    Catch {
-        #You should never really run into an exception in normal usage
-        Write-Warning -Message "Failed to create Wscript.Shell COM object"
-        Write-Warning -Message ($_.exception.message)
-    }
-} #EndFunction New-Popup
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'New-Popup'
-    $FuncAlias       = ''
-    $FuncDescription = 'Creates a new message dialog box'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    process {
+        # set $ShowOnTopValue based on switch
+        if ($ShowOnTop) {
+            $ShowOnTopValue = 4096
+        } else {
+            $ShowOnTopValue = 0
+        }
+
+        #lookup key to convert buttons to their integer equivalents
+        $ButtonsKey = @{
+            "OK"               = 0
+            "OKCancel"         = 1
+            "AbortRetryIgnore" = 2
+            "YesNo"            = 4
+            "YesNoCancel"      = 3
+            "RetryCancel"      = 5
+        }
+
+        #lookup key to convert icon to their integer equivalents
+        $IconKey = @{
+            "Stop"        = 16
+            "Question"    = 32
+            "Exclamation" = 48
+            "Information" = 64
+            "None"        =  0
+        }
+
+        #lookup key to convert return value to human readable button press
+        $ReturnKey =   @{
+            -1 = 'Timeout'
+             1 = 'OK'
+             2 = 'Cancel'
+             3 = 'Abort'
+             4 = 'Retry'
+             5 = 'Ignore'
+             6 = 'Yes'
+             7 = 'No'
+        }
+
+        #create the COM Object
+        Try {
+            $wshell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
+            #Button and icon type values are added together to create an integer value
+            $return = $wshell.Popup($Message,$Time,$Title,$ButtonsKey[$Buttons] + $Iconkey[$Icon] + $ShowOnTopValue)
+            if ($return -eq -1) {
+                write-verbose "User timedout [$($returnkey[$return])] after [$time] seconds"
+            } else {
+                write-verbose "User pressed [$($returnkey[$return])]"
+            }
+            $return
+        }
+        Catch {
+            #You should never really run into an exception in normal usage
+            Write-Warning -Message "Failed to create Wscript.Shell COM object"
+            Write-Warning -Message ($_.exception.message)
+        }
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+
+} #EndFunction New-Popup

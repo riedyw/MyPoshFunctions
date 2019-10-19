@@ -66,25 +66,21 @@ function Convert-BitShift {
         [switch] $IncludeOriginal
     )
     begin {
-        write-verbose -Message "`$PSCmdlet.ParameterSetName is [$($PSCmdlet.ParameterSetName)]"
-        $shift = if($PSCmdlet.ParameterSetName -eq 'Left')
-        {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
+
+        $shift = if($PSCmdlet.ParameterSetName -eq 'Left') {
             $Left
-        }
-        else
-        {
+        } else {
             (-1) * $Right
         }
         $report = @()
-    }
+    } # end begin
+
     process {
-        foreach ($int in $Integer)
-        {
+        foreach ($int in $Integer) {
             $returnVal = [math]::Floor($int * [math]::Pow(2,$shift))
-            if ($IncludeOriginal)
-            {
-                if ($Left)
-                {
+            if ($IncludeOriginal) {
+                if ($Left) {
                     $prop = @{ Input = $int ; Shift = 'Left'; Pos = $Left; Output = $returnVal }
                 }
                 else
@@ -101,41 +97,13 @@ function Convert-BitShift {
 #                write-output -InputObject (,[int] $returnVal)
             }
         }
-    }
+    } # end process
+
     end
     {
         write-output -InputObject $report
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
 } # EndFunction Convert-BitShift
 
-#region Metadata
-# These variables are used to set the Description property of the function.
-
-Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-
-$FuncName        = 'Convert-BitShift'
-$FuncAlias       = 'BitShift'
-$FuncDescription = 'Bit shifts an integer either LEFT or RIGHT.'
-
-if (-not (test-path -Path Variable:AliasesToExport))
-{
-    $AliasesToExport = @()
-}
-if (-not (test-path -Path Variable:VariablesToExport))
-{
-    $VariablesToExport = @()
-}
-
-if ($FuncAlias)
-{
-    set-alias -Name $FuncAlias -Value $FuncName -Description "ALIAS for $FuncName"
-    $AliasesToExport += (new-object psobject -property @{ Name = $FuncAlias ; Description = "ALIAS for $FuncName"})
-}
-
-# Setting the Description property of the function.
-(get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-
-#endregion Metadata
-
+set-alias -name 'BitShift' -value 'Convert-BitShift' -Description 'Alias for Convert-BitShift'

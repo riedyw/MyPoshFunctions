@@ -3,8 +3,7 @@
 Function Test-IsScrollLock {
 <#
 .SYNOPSIS
-Sets the state of the ScrollLock button. If you pass $true to function it will turn on
-ScrollLock.
+Sets the state of the ScrollLock button. If you pass $true to function it will turn on ScrollLock.
 .DESCRIPTION
 Sets the state of the ScrollLock button. If you pass $true to function it will turn on
 ScrollLock. It first determines the state of the ScrollLock and then acts accordingly.
@@ -19,7 +18,7 @@ Will turn off the ScrollLock
 .INPUTS
 None
 .OUTPUTS
-None
+bool
 .NOTES
 Author:      Bill Riedy
 Inspiration: # Inspired by https://gallery.technet.microsoft.com/on-off-keyboad-lock-keys-6ba9885c
@@ -30,38 +29,18 @@ Changes:     Created function to set on or off the ScrollLock. Requires use of h
     [CmdletBinding()]
     [OutputType([bool])]
     Param()
-    write-verbose -Message 'Determining the state of [ScrollLock]'
-    [System.Windows.Forms.Control]::IsKeyLocked('Scroll')
-}
 
-#region Metadata
-    # These variables are used to set the Description property of the function.
-    # and whether they are meant to be exported
-    Remove-Variable -Name FuncName        -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncAlias       -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncDescription -ErrorAction SilentlyContinue
-    Remove-Variable -Name FuncVarName     -ErrorAction SilentlyContinue
-    $FuncName        = 'Test-IsScrollLock'
-    $FuncAlias       = ''
-    $FuncDescription = 'Determines the state of ScrollLock'
-    $FuncVarName     = ''
-    if (-not (test-path -Path Variable:AliasesToExport))
-    {
-        $AliasesToExport = @()
+
+    Begin {
+        Write-Verbose -Message "Starting $($MyInvocation.Mycommand)"
     }
-    if (-not (test-path -Path Variable:VariablesToExport))
-    {
-        $VariablesToExport = @()
+
+    Process {
+        write-verbose -Message 'Determining the state of [ScrollLock]'
+        [System.Windows.Forms.Control]::IsKeyLocked('Scroll')
     }
-    if ($FuncAlias)
-    {
-        set-alias -Name $FuncAlias -Value $FuncName
-        $AliasesToExport += $FuncAlias
+
+    End {
+        Write-Verbose -Message "Ending $($MyInvocation.Mycommand)"
     }
-    if ($FuncVarName)
-    {
-        $VariablesToExport += $FuncVarName
-    }
-    # Setting the Description property of the function.
-    (get-childitem -Path Function:$FuncName).set_Description($FuncDescription)
-#endregion Metadata
+}
