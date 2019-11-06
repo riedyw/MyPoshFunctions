@@ -27,7 +27,7 @@ Filter Set-Type {
 
 #    Process {
         foreach ($key in $($type_hash.keys)) {
-        $_.$key = $($_.$key -as $type_hash[$key])
+            $_.$key = $($_.$key -as $type_hash[$key])
         }
         $_
 #    }
