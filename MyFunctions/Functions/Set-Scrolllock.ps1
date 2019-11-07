@@ -9,10 +9,10 @@ Function Set-Scrolllock {
 .PARAMETER State
     A switch parameter to determine if you want the ScrollLock to be $true or $false.
 .EXAMPLE
-    Set-ScrollLock -State
+    Set-ScrollLock
     Will turn on the ScrollLock
 .EXAMPLE
-    Set-ScrollLock -State:$false
+    Set-ScrollLock -On $false
     Will turn off the ScrollLock
 .INPUTS
     None
@@ -31,7 +31,7 @@ Function Set-Scrolllock {
     [OutputType($null)]
     Param(
         [parameter(Mandatory=$false)]
-        [bool] $State = $true
+        [bool] $On = $true
     )
 
     Begin {
@@ -40,21 +40,21 @@ Function Set-Scrolllock {
 
     process {
         $CurrentState = Test-IsScrollLock
-        $ShouldMessage = "ScrollLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($State.ToString().ToUpper())]"
+        $ShouldMessage = "ScrollLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($On.ToString().ToUpper())]"
         If ($PSCmdlet.ShouldProcess($ShouldMessage))
         {
             if ($CurrentState -eq $true) {
                 write-verbose 'ScrollLock is currently ON'
-                if (-not $State) {
-                    write-verbose "Setting ScrollLock to $State"
+                if (-not $On) {
+                    write-verbose "Setting ScrollLock to OFF"
                     $wShell = New-Object -ComObject wscript.shell -ErrorAction Stop
                     $wShell.SendKeys("{ScrollLock}")
                     remove-variable -name wShell
                 }
             } else {
                 write-verbose 'ScrollLock is currently OFF'
-                if ($State) {
-                    write-verbose "Setting ScrollLock to $State"
+                if ($On) {
+                    write-verbose "Setting ScrollLock to ON"
                     $wShell = New-Object -ComObject wscript.shell -ErrorAction Stop
                     $wShell.SendKeys("{ScrollLock}")
                     remove-variable -name wShell

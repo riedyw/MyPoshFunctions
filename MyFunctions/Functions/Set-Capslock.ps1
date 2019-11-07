@@ -7,10 +7,10 @@ Function Set-Capslock {
 .PARAMETER State
     A switch parameter to determine if you want the CapsLock to be $true or $false.
 .EXAMPLE
-    Set-CapsLock -State
+    Set-CapsLock
     Will turn on the CapsLock
 .EXAMPLE
-    Set-CapsLock -State:$false
+    Set-CapsLock -On $false
     Will turn off the CapsLock
 .INPUTS
     None
@@ -28,7 +28,7 @@ Function Set-Capslock {
     [CmdletBinding(ConfirmImpact='Low',SupportsShouldProcess = $true)]
     [OutputType($null)]
     param(
-        [bool] $State = $true
+        [bool] $On = $true
     )
 
     Begin {
@@ -37,21 +37,21 @@ Function Set-Capslock {
 
     process {
         $CurrentState = Test-IsCapsLock
-        $ShouldMessage = "CapsLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($State.ToString().ToUpper())]"
+        $ShouldMessage = "CapsLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($On.ToString().ToUpper())]"
         If ($PSCmdlet.ShouldProcess($ShouldMessage))
         {
             if ($CurrentState -eq $true) {
-                write-verbose -Message 'Current state is TRUE'
-                if ($State -eq $false) {
-                    write-verbose -Message 'Setting state to FALSE'
+                write-verbose -Message 'Current state is ON'
+                if (-not $On) {
+                    write-verbose -Message 'Setting state to OFF'
                     $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
                     $wShell.SendKeys("{CapsLock}")
                     remove-variable -name wShell
                 }
             } else {
-                write-verbose -Message 'Current state is FALSE'
-                if ($State -eq $true) {
-                    write-verbose -Message 'Setting state to TRUE'
+                write-verbose -Message 'Current state is OFF'
+                if ($On) {
+                    write-verbose -Message 'Setting state to ON'
                     $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
                     $wShell.SendKeys("{CapsLock}")
                     remove-variable -name wShell

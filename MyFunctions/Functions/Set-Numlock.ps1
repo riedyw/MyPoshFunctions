@@ -7,10 +7,10 @@ Function Set-Numlock {
 .PARAMETER State
     A switch parameter to determine if you want the NumLock to be $true or $false.
 .EXAMPLE
-    Set-NumLock -State
+    Set-NumLock -On $true
     Will turn on the NumLock
 .EXAMPLE
-    Set-NumLock -State:$false
+    Set-NumLock -On $false
     Will turn off the NumLock
 .INPUTS
     None
@@ -28,7 +28,7 @@ Function Set-Numlock {
     [CmdletBinding(ConfirmImpact='Low',SupportsShouldProcess = $true)]
     [OutputType($null)]
     param(
-        [bool] $State = $true
+        [bool] $On = $true
     )
 
     Begin {
@@ -37,21 +37,21 @@ Function Set-Numlock {
 
     Process {
         $CurrentState = Test-IsNumLock
-        $ShouldMessage = "NumLock currently [$($CurrentState.ToString().ToUpper())] and desired state is [$($State.ToString().ToUpper())]"
+        $ShouldMessage = "NumLock currently [$($CurrentState.ToString().ToUpper())] and desired On is [$($On.ToString().ToUpper())]"
         If ($PSCmdlet.ShouldProcess($ShouldMessage))
         {
             if ($CurrentState -eq $true) {
-                write-verbose -Message 'Current state is TRUE'
-                if ($State -eq $false) {
-                    write-verbose -Message 'Setting state to FALSE'
+                write-verbose -Message 'Current state is ON'
+                if (-not $On) {
+                    write-verbose -Message 'Setting state to OFF'
                     $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
                     $wShell.SendKeys("{NUMLOCK}")
                     remove-variable -name wShell
                 }
             } else {
-                write-verbose -Message 'Current state is FALSE'
-                if ($State -eq $true) {
-                    write-verbose -Message 'Setting state to TRUE'
+                write-verbose -Message 'Current state is OFF'
+                if ($On) {
+                    write-verbose -Message 'Setting state to ON'
                     $wShell = New-Object -ComObject Wscript.Shell -ErrorAction Stop
                     $wShell.SendKeys("{NUMLOCK}")
                     remove-variable -name wShell

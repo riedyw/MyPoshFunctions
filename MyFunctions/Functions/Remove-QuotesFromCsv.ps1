@@ -51,9 +51,9 @@ Function Remove-QuotesFromCsv {
     Process {
         foreach ($line in $csv) {
             write-verbose ("Current line: " + $line)
-            $line | foreach-object { $_ -replace ('"' + $Delimiter + '"'), $Delimiter} |
-                foreach-object { $_ -replace ('^"'),''} |
-                foreach-object { $_ -replace '"$',''}
+            # .replace method uses literal strings to search for
+            # -replace operator uses regex string expressions to search for text
+            $line | foreach-object { $_.replace(('"' + $Delimiter),'|').replace(($Delimiter +'"'),'|') -replace '^"','' -replace '"$', ''}
         }
     }
 
